@@ -5,8 +5,8 @@ import { api } from "@/api/client"
 import { useAuth } from "@/auth"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import type { CreatePostRequest } from "@/types"
 
@@ -36,11 +36,7 @@ function NewPost() {
   const { user } = useAuth()
   const navigate = useNavigate()
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<FormData>()
+  const form = useForm<FormData>()
 
   const onSubmit = async (data: FormData) => {
     if (!user) return
@@ -83,43 +79,67 @@ function NewPost() {
           <CardTitle>New Post</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={(e) => void handleSubmit(onSubmit)(e)} className="space-y-4">
-            <div>
-              <Label htmlFor="title">Title</Label>
-              <Input id="title" {...register("title", { required: "Title is required" })} placeholder="Enter post title" />
-              {errors.title && <p className="text-sm text-red-600 mt-1">{errors.title.message}</p>}
-            </div>
-
-            <div>
-              <Label htmlFor="content">Content</Label>
-              <Textarea
-                id="content"
-                {...register("content", { required: "Content is required" })}
-                placeholder="Write your post content here..."
-                rows={8}
+          <Form {...form}>
+            <form onSubmit={(e) => void form.handleSubmit(onSubmit)(e)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="title"
+                rules={{ required: "Title is required" }}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Title</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter post title" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-              {errors.content && <p className="text-sm text-red-600 mt-1">{errors.content.message}</p>}
-            </div>
 
-            <div>
-              <Label htmlFor="tags">Tags (optional)</Label>
-              <Input id="tags" {...register("tags")} placeholder="Enter tags separated by commas" />
-              <p className="text-sm text-gray-500 mt-1">Example: discussion, help, feature-request</p>
-            </div>
+              <FormField
+                control={form.control}
+                name="content"
+                rules={{ required: "Content is required" }}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Content</FormLabel>
+                    <FormControl>
+                      <Textarea placeholder="Write your post content here..." rows={8} {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <div className="flex gap-3 pt-4">
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? "Creating..." : "Create Post"}
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => void navigate({ to: "/forums/$forumId", params: { forumId } })}
-              >
-                Cancel
-              </Button>
-            </div>
-          </form>
+              <FormField
+                control={form.control}
+                name="tags"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tags (optional)</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter tags separated by commas" {...field} />
+                    </FormControl>
+                    <p className="text-sm text-gray-500 mt-1">Example: discussion, help, feature-request</p>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="flex gap-3 pt-4">
+                <Button type="submit" disabled={form.formState.isSubmitting}>
+                  {form.formState.isSubmitting ? "Creating..." : "Create Post"}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => void navigate({ to: "/forums/$forumId", params: { forumId } })}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </form>
+          </Form>
         </CardContent>
       </Card>
     </div>

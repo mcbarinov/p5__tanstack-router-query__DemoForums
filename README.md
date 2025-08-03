@@ -132,6 +132,7 @@ Routes under `_authenticated/` require authentication. Unauthorized users are re
 - `/login` - Login page
 - `/forums` - All forums list
 - `/forums/:forumId` - Specific forum posts
+- `/forums/:forumId/new` - Create new post form
 - `/forums/:forumId/:postId` - Post details with comments
 
 ## Development Commands
@@ -196,3 +197,57 @@ Using Tailwind CSS utility classes:
 - No separate CSS files (except `index.css`)
 - Components are self-contained with their styles
 - Consistent design through Tailwind classes
+
+### Form Handling
+
+Always use shadcn/ui Form components instead of direct react-hook-form usage for better accessibility and consistency.
+
+**✅ CORRECT - Use shadcn/ui Form components:**
+
+```typescript
+import { useForm } from "react-hook-form"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+
+const form = useForm<FormData>()
+
+<Form {...form}>
+  <form onSubmit={form.handleSubmit(onSubmit)}>
+    <FormField
+      control={form.control}
+      name="title"
+      rules={{ required: "Title is required" }}
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel>Title</FormLabel>
+          <FormControl>
+            <Input placeholder="Enter title" {...field} />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+    <Button type="submit">Submit</Button>
+  </form>
+</Form>
+```
+
+**❌ AVOID - Direct react-hook-form usage:**
+
+```typescript
+// Don't do this - lacks accessibility features
+const { register, formState: { errors } } = useForm()
+
+<form>
+  <Label htmlFor="title">Title</Label>
+  <Input {...register("title", { required: "Title is required" })} />
+  {errors.title && <p>{errors.title.message}</p>}
+</form>
+```
+
+**Benefits of shadcn/ui Form components:**
+
+- **Accessibility**: Automatic ARIA attributes, unique IDs, and proper field associations
+- **Consistency**: Standardized structure across all forms
+- **Error Handling**: Automatic error display with `<FormMessage />`
+- **Type Safety**: Better TypeScript integration with field names
+- **Maintainability**: Cleaner, more readable form code
