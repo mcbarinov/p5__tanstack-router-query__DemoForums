@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
 
-import { api } from "@/api/client"
+import { api } from "@/lib/api"
 import { PostsListSkeleton } from "@/components/loading/PostsListSkeleton"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"

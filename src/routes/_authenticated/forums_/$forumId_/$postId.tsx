@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router"
 
-import { api } from "@/api/client"
+import { api } from "@/lib/api"
 import { PostDetailSkeleton } from "@/components/loading/PostDetailSkeleton"
 import { PostBreadcrumb } from "@/components/navigation/PostBreadcrumb"
 

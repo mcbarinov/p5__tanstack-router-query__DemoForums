@@ -96,6 +96,14 @@ import { api } from "../../../../api/client"
 - API calls must go through `api/client.ts`
 - Handle loading and error states properly
 
+### No Backward Compatibility
+
+- **This is a DEMO project**
+- **NEVER** add backward compatibility layers
+- Always prefer clean, direct implementations
+- Remove any re-exports or compatibility code immediately
+- When refactoring, update all usage immediately - no deprecated APIs
+
 ## Development Workflow
 
 1. Understand the requirement fully

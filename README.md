@@ -17,8 +17,11 @@ A demonstration forum application built with modern React and TypeScript stack.
 
 ```
 src/
-├── api/
-│   └── client.ts          # API client with HTTP request simulation
+├── lib/
+│   ├── api.ts             # Clean API with ONLY HTTP requests
+│   ├── http-client.ts     # HTTP client configuration (Ky setup)
+│   ├── auth-storage.ts    # Authentication storage utilities
+│   └── utils.ts           # General utilities (cn function)
 ├── components/
 │   ├── layout/           # Shared layout components
 │   │   ├── Header.tsx
@@ -77,7 +80,7 @@ import * as z from "zod"
 2. **Project modules** (using `@/` alias)
 
 ```typescript
-import { api } from "@/api/client"
+import { api } from "@/lib/api"
 import { PostDetailSkeleton } from "@/components/loading/PostDetailSkeleton"
 import { useAuth } from "@/auth"
 import type { User } from "@/types"
@@ -114,13 +117,42 @@ export const Route = createFileRoute("/path")({
 })
 ```
 
-### API Client with Simulation
+### Clean API Architecture
 
-The API client (`src/api/client.ts`) simulates real HTTP requests:
+The API client (`src/lib/api.ts`) follows strict clean architecture principles:
 
-- Random delay 200-800ms
-- Hardcoded data
-- Ready to be replaced with real API
+**API Contains ONLY HTTP requests:**
+
+```typescript
+export const api = {
+  // ✅ GOOD - Pure HTTP request
+  async login(credentials: LoginCredentials): Promise<AuthResponse> {
+    return await httpClient.post("auth/login", { json: credentials }).json<AuthResponse>()
+  },
+
+  // ❌ BAD - Side effects in API
+  async login(credentials: LoginCredentials): Promise<AuthResponse> {
+    const response = await httpClient.post("auth/login", { json: credentials }).json<AuthResponse>()
+    localStorage.setItem("user", JSON.stringify(response.user)) // ❌ Storage logic doesn't belong here
+    return response
+  },
+}
+```
+
+**Core Principles:**
+
+- **No side effects** - API methods only make HTTP requests
+- **No storage logic** - localStorage/sessionStorage handled in auth layer
+- **No business logic** - Pure HTTP communication only
+- **No backward compatibility** - This is a demo project, keep it clean
+- **Single responsibility** - Each method does one HTTP request
+
+**Separation of Concerns:**
+
+- `lib/api.ts` - Pure HTTP requests
+- `lib/http-client.ts` - HTTP client configuration (Ky setup)
+- `lib/auth-storage.ts` - Storage utilities
+- `auth.tsx` - Authentication logic and state management
 
 ### Protected Routes
 

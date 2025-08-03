@@ -1,6 +1,7 @@
 import * as React from "react"
 
-import { api } from "@/api/client"
+import { api } from "@/lib/api"
+import { getStoredSessionId, getStoredUser, clearAuthData, setStoredSessionId, setStoredUser } from "@/lib/auth-storage"
 import type { User } from "@/types"
 
 export interface AuthContext {
@@ -15,12 +16,12 @@ const AuthContext = React.createContext<AuthContext | null>(null)
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = React.useState<User | null>(() => {
     // Validate both sessionId and user data exist
-    const sessionId = api.getSessionId()
-    const storedUser = api.getUser()
+    const sessionId = getStoredSessionId()
+    const storedUser = getStoredUser()
 
     // If either is missing, clear all auth data and force re-login
     if (!sessionId || !storedUser) {
-      api.clearAuthData()
+      clearAuthData()
       return null
     }
 
@@ -30,11 +31,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = React.useCallback(async () => {
     await api.logout()
+    clearAuthData()
     setUser(null)
   }, [])
 
   const login = React.useCallback(async (username: string, password: string) => {
     const response = await api.login({ username, password })
+    // Handle storage after successful API call
+    setStoredSessionId(response.sessionId)
+    setStoredUser(response.user)
     setUser(response.user)
   }, [])
 
