@@ -2,3 +2,7 @@ pnpm create vite@latest -t react-ts p4
 pnpm add @tanstack/react-router @tanstack/react-router-devtools tailwindcss @tailwindcss/vite
 pnpm add -D eslint-plugin-react-x eslint-plugin-react-dom prettier eslint-config-prettier @types/node @tanstack/router-plugin
 echo '@import "tailwindcss";' > src/index.css
+pnpm add @tanstack/react-query
+pnpm add -D @tanstack/eslint-plugin-query
+pnpm dlx shadcn@latest init
+pnpm dlx shadcn@latest add form dropdown-menu dialog card table textarea
