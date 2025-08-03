@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --port 3000",
+    "dev:agent": "vite --port 3001",
     "build": "tsc -b && vite build",
     "format": "prettier --write .",
     "lint": "eslint .",
@@ -23,12 +24,15 @@
     "@tanstack/react-router-devtools": "^1.130.10",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "ky": "^1.8.2",
     "lucide-react": "^0.536.0",
+    "msw": "^2.10.4",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-hook-form": "^7.62.0",
     "tailwind-merge": "^3.3.1",
     "tailwindcss": "^4.1.11",
+    "uuid": "^11.1.0",
     "zod": "^4.0.14"
   },
   "devDependencies": {
@@ -52,5 +56,10 @@
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.35.1",
     "vite": "^7.0.4"
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
+    ]
   }
 }

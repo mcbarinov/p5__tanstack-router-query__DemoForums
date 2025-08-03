@@ -12,44 +12,36 @@ export interface AuthContext {
 
 const AuthContext = React.createContext<AuthContext | null>(null)
 
-const key = "tanstack.auth.user"
-
-function getStoredUser(): User | null {
-  const stored = localStorage.getItem(key)
-  if (!stored) return null
-  try {
-    return JSON.parse(stored) as User
-  } catch {
-    return null
-  }
-}
-
-function setStoredUser(user: User | null) {
-  if (user) {
-    localStorage.setItem(key, JSON.stringify(user))
-  } else {
-    localStorage.removeItem(key)
-  }
-}
-
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = React.useState<User | null>(getStoredUser())
+  const [user, setUser] = React.useState<User | null>(() => {
+    // Initialize user based on sessionId presence
+    const sessionId = localStorage.getItem("tanstack.auth.session")
+    if (sessionId) {
+      // Create minimal user object - real validation happens on first API call
+      return { id: 0, username: "authenticated", role: "user" } as User
+    }
+    return null
+  })
   const isAuthenticated = !!user
 
   const logout = React.useCallback(async () => {
     await api.logout()
-    setStoredUser(null)
     setUser(null)
   }, [])
 
   const login = React.useCallback(async (username: string, password: string) => {
     const response = await api.login({ username, password })
-    setStoredUser(response.user)
     setUser(response.user)
   }, [])
 
+  // Listen for automatic logout events from API client
   React.useEffect(() => {
-    setUser(getStoredUser())
+    const handleAutoLogout = () => {
+      setUser(null)
+    }
+
+    window.addEventListener("auth:logout", handleAutoLogout)
+    return () => window.removeEventListener("auth:logout", handleAutoLogout)
   }, [])
 
   const value = React.useMemo(() => ({ isAuthenticated, user, login, logout }), [isAuthenticated, user, login, logout])

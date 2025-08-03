@@ -109,3 +109,10 @@ import { api } from "../../../../api/client"
 - After making changes: `pnpm run lint`
 - Before committing: `pnpm run format`
 - To verify build: `pnpm run build`
+
+### Development Server Rules
+
+- **HUMANS**: Use `pnpm run dev` (port 3000)
+- **AI AGENTS**: Use `pnpm run dev:agent` (port 3001)
+
+**IMPORTANT**: AI agents MUST NOT run `pnpm run dev` - this is reserved for human developers only. Always use `pnpm run dev:agent` instead.

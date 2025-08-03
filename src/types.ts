@@ -42,7 +42,7 @@ export interface LoginCredentials {
 
 export interface AuthResponse {
   user: User
-  token?: string
+  sessionId: string
 }
 
 export interface CreatePostRequest {

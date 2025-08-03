@@ -1,9 +1,49 @@
-import type { Forum, Post, Comment, User, LoginCredentials, AuthResponse, CreatePostRequest } from "../types"
+import ky, { HTTPError } from "ky"
 
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+import type { Forum, Post, Comment, LoginCredentials, AuthResponse, CreatePostRequest } from "../types"
 
-const getRandomDelay = () => Math.floor(Math.random() * 600) + 200
+// Session storage for client
+const SESSION_KEY = "tanstack.auth.session"
 
+function getStoredSessionId(): string | null {
+  return localStorage.getItem(SESSION_KEY)
+}
+
+function setStoredSessionId(sessionId: string | null) {
+  if (sessionId) {
+    localStorage.setItem(SESSION_KEY, sessionId)
+  } else {
+    localStorage.removeItem(SESSION_KEY)
+  }
+}
+
+// HTTP client with automatic session handling
+const apiClient = ky.create({
+  prefixUrl: "/api",
+  hooks: {
+    beforeRequest: [
+      (request) => {
+        const sessionId = getStoredSessionId()
+        if (sessionId) {
+          request.headers.set("Authorization", `Bearer ${sessionId}`)
+        }
+      },
+    ],
+    afterResponse: [
+      (_request, _options, response) => {
+        // Handle 401 responses by clearing session
+        if (response.status === 401) {
+          setStoredSessionId(null)
+          // Trigger auth state update by dispatching custom event
+          window.dispatchEvent(new CustomEvent("auth:logout"))
+        }
+        return response
+      },
+    ],
+  },
+})
+
+// Mock data (moved to end for better organization)
 const mockForums: Forum[] = [
   { id: 1, name: "General Discussion", description: "Talk about anything and everything", category: "Technology" },
   { id: 2, name: "Tech Support", description: "Get help with technical issues", category: "Technology" },
@@ -198,64 +238,53 @@ const mockComments: Comment[] = [
   },
 ]
 
-const mockUsers: (User & { password: string })[] = [
-  { id: 1, username: "admin", password: "admin", role: "admin" },
-  { id: 2, username: "user1", password: "user1", role: "user" },
-  { id: 3, username: "alice", password: "alice", role: "user" },
-  { id: 4, username: "bob", password: "bob", role: "user" },
-]
-
 export const api = {
-  async getForums(): Promise<Forum[]> {
-    await delay(getRandomDelay())
-    return [...mockForums]
-  },
+  // Session management
+  getSessionId: getStoredSessionId,
+  setSessionId: setStoredSessionId,
 
-  async getForum(id: number): Promise<Forum | undefined> {
-    await delay(getRandomDelay())
-    return mockForums.find((f) => f.id === id)
-  },
-
-  async getPostsByForum(forumId: number): Promise<Post[]> {
-    await delay(getRandomDelay())
-    return mockPosts.filter((p) => p.forumId === forumId)
-  },
-
-  async getPost(id: number): Promise<Post | undefined> {
-    await delay(getRandomDelay())
-    return mockPosts.find((p) => p.id === id)
-  },
-
-  async getCommentsByPost(postId: number): Promise<Comment[]> {
-    await delay(getRandomDelay())
-    return mockComments.filter((c) => c.postId === postId)
-  },
-
+  // Auth endpoints
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
-    await delay(getRandomDelay())
-
-    const user = mockUsers.find((u) => u.username === credentials.username && u.password === credentials.password)
-
-    if (!user) {
-      throw new Error("Invalid username or password")
-    }
-
-    return {
-      user: {
-        id: user.id,
-        username: user.username,
-        role: user.role,
-      },
+    try {
+      const response = await apiClient.post("auth/login", { json: credentials }).json<AuthResponse>()
+      setStoredSessionId(response.sessionId)
+      return response
+    } catch (error) {
+      // Handle 401 authentication errors
+      if (error instanceof HTTPError && error.response.status === 401) {
+        throw new Error("Invalid username or password")
+      }
+      throw new Error("Login failed. Please try again.")
     }
   },
 
   async logout(): Promise<void> {
-    await delay(200)
+    await apiClient.post("auth/logout")
+    setStoredSessionId(null)
   },
 
-  async createPost(request: CreatePostRequest): Promise<Post> {
-    await delay(getRandomDelay())
+  // Forum endpoints - fallback to mock data for now
+  getForums(): Promise<Forum[]> {
+    return Promise.resolve([...mockForums])
+  },
 
+  getForum(id: number): Promise<Forum | undefined> {
+    return Promise.resolve(mockForums.find((f) => f.id === id))
+  },
+
+  getPostsByForum(forumId: number): Promise<Post[]> {
+    return Promise.resolve(mockPosts.filter((p) => p.forumId === forumId))
+  },
+
+  getPost(id: number): Promise<Post | undefined> {
+    return Promise.resolve(mockPosts.find((p) => p.id === id))
+  },
+
+  getCommentsByPost(postId: number): Promise<Comment[]> {
+    return Promise.resolve(mockComments.filter((c) => c.postId === postId))
+  },
+
+  createPost(request: CreatePostRequest): Promise<Post> {
     const newId = Math.max(...mockPosts.map((p) => p.id)) + 1
     const now = new Date()
 
@@ -271,6 +300,6 @@ export const api = {
     }
 
     mockPosts.push(newPost)
-    return newPost
+    return Promise.resolve(newPost)
   },
 }
