@@ -14,13 +14,17 @@ const AuthContext = React.createContext<AuthContext | null>(null)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = React.useState<User | null>(() => {
-    // Initialize user based on sessionId presence
-    const sessionId = localStorage.getItem("tanstack.auth.session")
-    if (sessionId) {
-      // Create minimal user object - real validation happens on first API call
-      return { id: 0, username: "authenticated", role: "user" } as User
+    // Validate both sessionId and user data exist
+    const sessionId = api.getSessionId()
+    const storedUser = api.getUser()
+
+    // If either is missing, clear all auth data and force re-login
+    if (!sessionId || !storedUser) {
+      api.clearAuthData()
+      return null
     }
-    return null
+
+    return storedUser
   })
   const isAuthenticated = !!user
 

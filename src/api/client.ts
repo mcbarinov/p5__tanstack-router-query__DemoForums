@@ -1,9 +1,10 @@
 import ky, { HTTPError } from "ky"
 
-import type { Forum, Post, Comment, LoginCredentials, AuthResponse, CreatePostRequest } from "../types"
+import type { Forum, Post, Comment, LoginCredentials, AuthResponse, CreatePostRequest, User } from "../types"
 
 // Session storage for client
 const SESSION_KEY = "tanstack.auth.session"
+const USER_KEY = "tanstack.auth.user"
 
 function getStoredSessionId(): string | null {
   return localStorage.getItem(SESSION_KEY)
@@ -15,6 +16,29 @@ function setStoredSessionId(sessionId: string | null) {
   } else {
     localStorage.removeItem(SESSION_KEY)
   }
+}
+
+function getStoredUser(): User | null {
+  const userStr = localStorage.getItem(USER_KEY)
+  if (!userStr) return null
+  try {
+    return JSON.parse(userStr) as User
+  } catch {
+    return null
+  }
+}
+
+function setStoredUser(user: User | null) {
+  if (user) {
+    localStorage.setItem(USER_KEY, JSON.stringify(user))
+  } else {
+    localStorage.removeItem(USER_KEY)
+  }
+}
+
+function clearAuthData() {
+  localStorage.removeItem(SESSION_KEY)
+  localStorage.removeItem(USER_KEY)
 }
 
 // HTTP client with automatic session handling
@@ -31,9 +55,9 @@ const apiClient = ky.create({
     ],
     afterResponse: [
       (_request, _options, response) => {
-        // Handle 401 responses by clearing session
+        // Handle 401 responses by clearing all auth data
         if (response.status === 401) {
-          setStoredSessionId(null)
+          clearAuthData()
           // Trigger auth state update by dispatching custom event
           window.dispatchEvent(new CustomEvent("auth:logout"))
         }
@@ -242,12 +266,15 @@ export const api = {
   // Session management
   getSessionId: getStoredSessionId,
   setSessionId: setStoredSessionId,
+  getUser: getStoredUser,
+  clearAuthData,
 
   // Auth endpoints
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
     try {
       const response = await apiClient.post("auth/login", { json: credentials }).json<AuthResponse>()
       setStoredSessionId(response.sessionId)
+      setStoredUser(response.user)
       return response
     } catch (error) {
       // Handle 401 authentication errors
@@ -260,7 +287,7 @@ export const api = {
 
   async logout(): Promise<void> {
     await apiClient.post("auth/logout")
-    setStoredSessionId(null)
+    clearAuthData()
   },
 
   // Forum endpoints - fallback to mock data for now
