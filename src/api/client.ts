@@ -1,4 +1,4 @@
-import type { Forum, Post, Comment, User, LoginCredentials, AuthResponse } from "../types"
+import type { Forum, Post, Comment, User, LoginCredentials, AuthResponse, CreatePostRequest } from "../types"
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
@@ -251,5 +251,26 @@ export const api = {
 
   async logout(): Promise<void> {
     await delay(200)
+  },
+
+  async createPost(request: CreatePostRequest): Promise<Post> {
+    await delay(getRandomDelay())
+
+    const newId = Math.max(...mockPosts.map((p) => p.id)) + 1
+    const now = new Date()
+
+    const newPost: Post = {
+      id: newId,
+      forumId: request.forumId,
+      title: request.title,
+      content: request.content,
+      tags: request.tags,
+      author: request.author,
+      createdAt: now,
+      updatedAt: now,
+    }
+
+    mockPosts.push(newPost)
+    return newPost
   },
 }

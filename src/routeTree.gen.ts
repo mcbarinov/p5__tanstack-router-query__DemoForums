@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedForumsRouteImport } from './routes/_authenticated/forums'
 import { Route as AuthenticatedForumsForumIdRouteImport } from './routes/_authenticated/forums_/$forumId'
+import { Route as AuthenticatedForumsForumIdNewRouteImport } from './routes/_authenticated/forums_/$forumId_/new'
 import { Route as AuthenticatedForumsForumIdPostIdRouteImport } from './routes/_authenticated/forums_/$forumId_/$postId'
 
 const LoginRoute = LoginRouteImport.update({
@@ -41,6 +42,12 @@ const AuthenticatedForumsForumIdRoute =
     path: '/forums/$forumId',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedForumsForumIdNewRoute =
+  AuthenticatedForumsForumIdNewRouteImport.update({
+    id: '/forums_/$forumId_/new',
+    path: '/forums/$forumId/new',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedForumsForumIdPostIdRoute =
   AuthenticatedForumsForumIdPostIdRouteImport.update({
     id: '/forums_/$forumId_/$postId',
@@ -54,6 +61,7 @@ export interface FileRoutesByFullPath {
   '/forums': typeof AuthenticatedForumsRoute
   '/forums/$forumId': typeof AuthenticatedForumsForumIdRoute
   '/forums/$forumId/$postId': typeof AuthenticatedForumsForumIdPostIdRoute
+  '/forums/$forumId/new': typeof AuthenticatedForumsForumIdNewRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -61,6 +69,7 @@ export interface FileRoutesByTo {
   '/forums': typeof AuthenticatedForumsRoute
   '/forums/$forumId': typeof AuthenticatedForumsForumIdRoute
   '/forums/$forumId/$postId': typeof AuthenticatedForumsForumIdPostIdRoute
+  '/forums/$forumId/new': typeof AuthenticatedForumsForumIdNewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -70,6 +79,7 @@ export interface FileRoutesById {
   '/_authenticated/forums': typeof AuthenticatedForumsRoute
   '/_authenticated/forums_/$forumId': typeof AuthenticatedForumsForumIdRoute
   '/_authenticated/forums_/$forumId_/$postId': typeof AuthenticatedForumsForumIdPostIdRoute
+  '/_authenticated/forums_/$forumId_/new': typeof AuthenticatedForumsForumIdNewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -79,6 +89,7 @@ export interface FileRouteTypes {
     | '/forums'
     | '/forums/$forumId'
     | '/forums/$forumId/$postId'
+    | '/forums/$forumId/new'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -86,6 +97,7 @@ export interface FileRouteTypes {
     | '/forums'
     | '/forums/$forumId'
     | '/forums/$forumId/$postId'
+    | '/forums/$forumId/new'
   id:
     | '__root__'
     | '/'
@@ -94,6 +106,7 @@ export interface FileRouteTypes {
     | '/_authenticated/forums'
     | '/_authenticated/forums_/$forumId'
     | '/_authenticated/forums_/$forumId_/$postId'
+    | '/_authenticated/forums_/$forumId_/new'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -139,6 +152,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedForumsForumIdRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/forums_/$forumId_/new': {
+      id: '/_authenticated/forums_/$forumId_/new'
+      path: '/forums/$forumId/new'
+      fullPath: '/forums/$forumId/new'
+      preLoaderRoute: typeof AuthenticatedForumsForumIdNewRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/forums_/$forumId_/$postId': {
       id: '/_authenticated/forums_/$forumId_/$postId'
       path: '/forums/$forumId/$postId'
@@ -153,12 +173,14 @@ interface AuthenticatedRouteChildren {
   AuthenticatedForumsRoute: typeof AuthenticatedForumsRoute
   AuthenticatedForumsForumIdRoute: typeof AuthenticatedForumsForumIdRoute
   AuthenticatedForumsForumIdPostIdRoute: typeof AuthenticatedForumsForumIdPostIdRoute
+  AuthenticatedForumsForumIdNewRoute: typeof AuthenticatedForumsForumIdNewRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedForumsRoute: AuthenticatedForumsRoute,
   AuthenticatedForumsForumIdRoute: AuthenticatedForumsForumIdRoute,
   AuthenticatedForumsForumIdPostIdRoute: AuthenticatedForumsForumIdPostIdRoute,
+  AuthenticatedForumsForumIdNewRoute: AuthenticatedForumsForumIdNewRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(

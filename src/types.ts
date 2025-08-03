@@ -44,3 +44,11 @@ export interface AuthResponse {
   user: User
   token?: string
 }
+
+export interface CreatePostRequest {
+  forumId: number
+  title: string
+  content: string
+  tags: string[]
+  author: string
+}
