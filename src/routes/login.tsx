@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router"
+import { createFileRoute, useNavigate, redirect } from "@tanstack/react-router"
 import { useAuth } from "../auth"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -14,6 +14,11 @@ const formSchema = z.object({
 })
 
 export const Route = createFileRoute("/login")({
+  beforeLoad: ({ context }) => {
+    if (context.auth.isAuthenticated) {
+      throw redirect({ to: "/forums" }) // eslint-disable-line @typescript-eslint/only-throw-error
+    }
+  },
   component: LoginPage,
   validateSearch: (search: Record<string, unknown>) => {
     return {
@@ -38,9 +43,6 @@ function LoginPage() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       await auth.login(values.username, values.password)
-      // Small delay to ensure auth context updates
-      await new Promise((resolve) => setTimeout(resolve, 100))
-      // Use router navigation after successful login
       await navigate({ to: search.redirect ?? "/forums" })
     } catch (error) {
       form.setError("root", {

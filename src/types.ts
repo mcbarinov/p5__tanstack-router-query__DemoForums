@@ -22,3 +22,19 @@ export interface Comment {
   createdAt: Date
   updatedAt: Date
 }
+
+export interface User {
+  id: number
+  username: string
+  role: "admin" | "user"
+}
+
+export interface LoginCredentials {
+  username: string
+  password: string
+}
+
+export interface AuthResponse {
+  user: User
+  token?: string
+}

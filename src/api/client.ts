@@ -1,4 +1,4 @@
-import type { Forum, Post, Comment } from "../types"
+import type { Forum, Post, Comment, User, LoginCredentials, AuthResponse } from "../types"
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
@@ -188,6 +188,13 @@ const mockComments: Comment[] = [
   },
 ]
 
+const mockUsers: (User & { password: string })[] = [
+  { id: 1, username: "admin", password: "admin", role: "admin" },
+  { id: 2, username: "user1", password: "user1", role: "user" },
+  { id: 3, username: "alice", password: "alice", role: "user" },
+  { id: 4, username: "bob", password: "bob", role: "user" },
+]
+
 export const api = {
   async getForums(): Promise<Forum[]> {
     await delay(getRandomDelay())
@@ -212,5 +219,27 @@ export const api = {
   async getCommentsByPost(postId: number): Promise<Comment[]> {
     await delay(getRandomDelay())
     return mockComments.filter((c) => c.postId === postId)
+  },
+
+  async login(credentials: LoginCredentials): Promise<AuthResponse> {
+    await delay(getRandomDelay())
+
+    const user = mockUsers.find((u) => u.username === credentials.username && u.password === credentials.password)
+
+    if (!user) {
+      throw new Error("Invalid username or password")
+    }
+
+    return {
+      user: {
+        id: user.id,
+        username: user.username,
+        role: user.role,
+      },
+    }
+  },
+
+  async logout(): Promise<void> {
+    await delay(200)
   },
 }

@@ -21,7 +21,7 @@ export function Header() {
   }
 
   const userInitials = auth.user
-    ? auth.user
+    ? auth.user.username
         .split(" ")
         .map((n) => n[0])
         .join("")
@@ -47,7 +47,7 @@ export function Header() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuLabel>{auth.user}</DropdownMenuLabel>
+              <DropdownMenuLabel>{auth.user?.username}</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => void handleLogout()}>Logout</DropdownMenuItem>
             </DropdownMenuContent>
