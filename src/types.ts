@@ -1,7 +1,10 @@
+export type Category = "Technology" | "Science" | "Art"
+
 export interface Forum {
   id: number
   name: string
   description: string
+  category: Category
 }
 
 export interface Post {
@@ -9,6 +12,7 @@ export interface Post {
   forumId: number
   title: string
   content: string
+  tags: string[]
   author: string
   createdAt: Date
   updatedAt: Date
@@ -23,10 +27,12 @@ export interface Comment {
   updatedAt: Date
 }
 
+export type Role = "admin" | "user"
+
 export interface User {
   id: number
   username: string
-  role: "admin" | "user"
+  role: Role
 }
 
 export interface LoginCredentials {

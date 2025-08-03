@@ -1,10 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
-import { Calendar, User } from "lucide-react"
 
 import { api } from "@/api/client"
 import { PostsListSkeleton } from "@/components/loading/PostsListSkeleton"
-import { Card, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 
 export const Route = createFileRoute("/_authenticated/forums_/$forumId")({
   loader: async ({ params }) => {
@@ -28,36 +27,38 @@ function ForumPosts() {
 
   return (
     <div>
-      <div className="mb-4">
-        <Link to="/forums" className="text-blue-600 hover:underline">
-          ← Back to forums
-        </Link>
+      <div className="flex items-center gap-3 mb-2">
+        <h2 className="text-2xl font-bold">{forum.name}</h2>
+        <Badge variant="secondary">{forum.category}</Badge>
       </div>
-
-      <h2 className="text-2xl font-bold mb-2">{forum.name}</h2>
       <p className="text-gray-600 mb-6">{forum.description}</p>
 
-      <div className="space-y-2">
-        {posts.map((post) => (
-          <Link key={post.id} to="/forums/$forumId/$postId" params={{ forumId, postId: post.id.toString() }} className="block">
-            <Card className="hover:shadow-md transition-shadow cursor-pointer">
-              <CardHeader>
-                <CardTitle className="text-lg">{post.title}</CardTitle>
-                <div className="flex items-center gap-4 mt-2">
-                  <Badge variant="secondary" className="flex items-center gap-1">
-                    <User className="h-3 w-3" />
-                    {post.author}
-                  </Badge>
-                  <Badge variant="outline" className="flex items-center gap-1">
-                    <Calendar className="h-3 w-3" />
-                    {new Date(post.createdAt).toLocaleDateString()}
-                  </Badge>
-                </div>
-              </CardHeader>
-            </Card>
-          </Link>
-        ))}
-      </div>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Date</TableHead>
+            <TableHead>Author</TableHead>
+            <TableHead>Post Title</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {posts.map((post) => (
+            <TableRow key={post.id} className="hover:bg-muted/50 cursor-pointer">
+              <TableCell>{new Date(post.createdAt).toLocaleDateString()}</TableCell>
+              <TableCell>{post.author}</TableCell>
+              <TableCell>
+                <Link
+                  to="/forums/$forumId/$postId"
+                  params={{ forumId, postId: post.id.toString() }}
+                  className="text-blue-600 hover:underline"
+                >
+                  {post.title}
+                </Link>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
     </div>
   )
 }

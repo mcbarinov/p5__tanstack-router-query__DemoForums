@@ -3,6 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router"
 import { api } from "@/api/client"
 import { ForumsListSkeleton } from "@/components/loading/ForumsListSkeleton"
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
 
 export const Route = createFileRoute("/_authenticated/forums")({
   loader: async () => {
@@ -25,7 +26,10 @@ function ForumsList() {
           <Link key={forum.id} to="/forums/$forumId" params={{ forumId: forum.id.toString() }} className="block">
             <Card className="hover:shadow-md transition-shadow cursor-pointer">
               <CardHeader>
-                <CardTitle className="text-lg">{forum.name}</CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-lg">{forum.name}</CardTitle>
+                  <Badge variant="secondary">{forum.category}</Badge>
+                </div>
                 <CardDescription>{forum.description}</CardDescription>
               </CardHeader>
             </Card>
