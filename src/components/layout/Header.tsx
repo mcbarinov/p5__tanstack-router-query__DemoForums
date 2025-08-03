@@ -1,7 +1,8 @@
 import { Link, useNavigate } from "@tanstack/react-router"
-import { useAuth } from "../../auth"
-import { Button } from "../ui/button"
-import { Avatar, AvatarFallback } from "../ui/avatar"
+
+import { useAuth } from "@/auth"
+import { Button } from "@/components/ui/button"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,7 +10,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "../ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu"
 
 export function Header() {
   const auth = useAuth()

@@ -1,7 +1,7 @@
 import * as React from "react"
 
-import { api } from "./api/client"
-import type { User } from "./types"
+import { api } from "@/api/client"
+import type { User } from "@/types"
 
 export interface AuthContext {
   isAuthenticated: boolean

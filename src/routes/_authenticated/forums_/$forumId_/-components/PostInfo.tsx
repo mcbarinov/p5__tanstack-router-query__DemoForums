@@ -1,5 +1,5 @@
-import type { Post } from "../../../../../types"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../../../components/ui/card"
+import type { Post } from "@/types"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
 interface PostInfoProps {
   post: Post

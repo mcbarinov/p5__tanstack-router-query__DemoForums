@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
-import { api } from "../../api/client"
-import { ForumsListSkeleton } from "../../components/loading/ForumsListSkeleton"
-import { Card, CardDescription, CardHeader, CardTitle } from "../../components/ui/card"
+
+import { api } from "@/api/client"
+import { ForumsListSkeleton } from "@/components/loading/ForumsListSkeleton"
+import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
 export const Route = createFileRoute("/_authenticated/forums")({
   loader: async () => {

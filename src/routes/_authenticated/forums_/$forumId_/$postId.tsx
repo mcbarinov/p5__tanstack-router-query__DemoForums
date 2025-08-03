@@ -1,9 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router"
+
+import { api } from "@/api/client"
+import { PostDetailSkeleton } from "@/components/loading/PostDetailSkeleton"
+import { PostBreadcrumb } from "@/components/navigation/PostBreadcrumb"
+
 import { PostInfo } from "./-components/PostInfo"
 import { CommentItem } from "./-components/CommentItem"
-import { api } from "../../../../api/client"
-import { PostDetailSkeleton } from "../../../../components/loading/PostDetailSkeleton"
-import { PostBreadcrumb } from "../../../../components/navigation/PostBreadcrumb"
 
 export const Route = createFileRoute("/_authenticated/forums_/$forumId_/$postId")({
   loader: async ({ params }) => {

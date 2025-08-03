@@ -1,6 +1,14 @@
 import { Link } from "@tanstack/react-router"
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "../ui/breadcrumb"
-import type { Forum, Post } from "../../types"
+
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
+import type { Forum, Post } from "@/types"
 
 interface PostBreadcrumbProps {
   forum: Forum

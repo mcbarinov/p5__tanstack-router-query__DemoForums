@@ -1,9 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
-import { api } from "../../../api/client"
-import { PostsListSkeleton } from "../../../components/loading/PostsListSkeleton"
-import { Card, CardHeader, CardTitle } from "../../../components/ui/card"
-import { Badge } from "../../../components/ui/badge"
 import { Calendar, User } from "lucide-react"
+
+import { api } from "@/api/client"
+import { PostsListSkeleton } from "@/components/loading/PostsListSkeleton"
+import { Card, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
 
 export const Route = createFileRoute("/_authenticated/forums_/$forumId")({
   loader: async ({ params }) => {

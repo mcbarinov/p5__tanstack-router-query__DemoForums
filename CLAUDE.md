@@ -56,6 +56,40 @@ Instead, I recommend keeping API calls in the centralized `api/client.ts` or usi
 - No inline styles - use Tailwind classes only
 - Prefer `interface` over `type` for object shapes
 
+### Import Rules (MANDATORY)
+
+**ALWAYS follow this exact order with empty lines between groups:**
+
+1. **External libraries** (node_modules)
+2. **Project modules** (using `@/` alias)
+3. **Local files** (relative paths)
+
+```typescript
+// ✅ CORRECT
+import { createFileRoute } from "@tanstack/react-router"
+import { useForm } from "react-hook-form"
+
+import { api } from "@/api/client"
+import { useAuth } from "@/auth"
+import type { User } from "@/types"
+
+import { PostInfo } from "./-components/PostInfo"
+```
+
+```typescript
+// ❌ WRONG
+import { PostInfo } from "./-components/PostInfo"
+import { createFileRoute } from "@tanstack/react-router"
+import { api } from "../../../../api/client"
+```
+
+**Rules:**
+
+- Use `@/` alias for ALL project files (never `../../../`)
+- Use relative paths ONLY for local components in same/sub directory
+- Always separate groups with empty lines
+- Use `import type` for TypeScript types when possible
+
 ### Data Fetching
 
 - Always use loader pattern for route data

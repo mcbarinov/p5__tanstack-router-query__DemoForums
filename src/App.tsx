@@ -1,6 +1,7 @@
 import { RouterProvider } from "@tanstack/react-router"
-import { useAuth } from "./auth"
-import { router } from "./router"
+
+import { useAuth } from "@/auth"
+import { router } from "@/router"
 
 export function App() {
   const auth = useAuth()

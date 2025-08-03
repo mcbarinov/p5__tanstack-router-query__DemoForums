@@ -62,6 +62,42 @@ src/
    - Use `interface` for objects
    - Use `type` for union types
 
+### Import Conventions
+
+Follow this strict order for imports with empty lines between groups:
+
+1. **External libraries** (from node_modules)
+
+```typescript
+import { createFileRoute } from "@tanstack/react-router"
+import { useForm } from "react-hook-form"
+import * as z from "zod"
+```
+
+2. **Project modules** (using `@/` alias)
+
+```typescript
+import { api } from "@/api/client"
+import { PostDetailSkeleton } from "@/components/loading/PostDetailSkeleton"
+import { useAuth } from "@/auth"
+import type { User } from "@/types"
+```
+
+3. **Local files** (relative paths)
+
+```typescript
+import { PostInfo } from "./-components/PostInfo"
+import { CommentItem } from "./CommentItem"
+```
+
+**Rules:**
+
+- Always use `@/` alias for project files instead of relative paths like `../../../`
+- Local components (same directory or subdirectory) use relative paths
+- Separate each group with an empty line
+- External libraries always come first
+- Type imports use `import type` when possible
+
 ## Key Features
 
 ### File-based Routing with Loaders

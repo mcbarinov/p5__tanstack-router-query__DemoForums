@@ -1,6 +1,7 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router"
-import { Header } from "../components/layout/Header"
-import { Footer } from "../components/layout/Footer"
+
+import { Header } from "@/components/layout/Header"
+import { Footer } from "@/components/layout/Footer"
 
 export const Route = createFileRoute("/_authenticated")({
   beforeLoad: ({ context, location }) => {

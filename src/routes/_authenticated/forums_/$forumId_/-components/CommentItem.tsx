@@ -1,5 +1,5 @@
-import type { Comment } from "../../../../../types"
-import { Card, CardContent, CardDescription, CardHeader } from "../../../../../components/ui/card"
+import type { Comment } from "@/types"
+import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card"
 
 interface CommentItemProps {
   comment: Comment
