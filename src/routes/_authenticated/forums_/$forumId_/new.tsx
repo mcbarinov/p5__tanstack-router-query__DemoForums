@@ -36,7 +36,13 @@ function NewPost() {
   const { user } = useAuth()
   const navigate = useNavigate()
 
-  const form = useForm<FormData>()
+  const form = useForm<FormData>({
+    defaultValues: {
+      title: "",
+      content: "",
+      tags: "",
+    },
+  })
 
   const onSubmit = async (data: FormData) => {
     if (!user) return
