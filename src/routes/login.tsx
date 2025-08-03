@@ -1,6 +1,17 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
 import { useAuth } from "../auth"
-import { useState } from "react"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import * as z from "zod"
+import { Button } from "../components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../components/ui/form"
+import { Input } from "../components/ui/input"
+
+const formSchema = z.object({
+  username: z.string().min(1, "Username is required"),
+  password: z.string().min(1, "Password is required"),
+})
 
 export const Route = createFileRoute("/login")({
   component: LoginPage,
@@ -12,58 +23,76 @@ export const Route = createFileRoute("/login")({
 })
 
 function LoginPage() {
-  const [username, setUsername] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
   const navigate = useNavigate()
   const auth = useAuth()
   const search = Route.useSearch()
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (username.trim() && !isLoading) {
-      setIsLoading(true)
-      try {
-        await auth.login(username)
-        await navigate({ to: search.redirect ?? "/forums" })
-      } finally {
-        setIsLoading(false)
-      }
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      username: "",
+      password: "",
+    },
+  })
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      await auth.login(values.username, values.password)
+      // Small delay to ensure auth context updates
+      await new Promise((resolve) => setTimeout(resolve, 100))
+      // Use router navigation after successful login
+      await navigate({ to: search.redirect ?? "/forums" })
+    } catch (error) {
+      form.setError("root", {
+        message: error instanceof Error ? error.message : "Invalid credentials",
+      })
     }
   }
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray-50">
-      <div className="bg-white p-8 rounded-lg shadow-md w-96">
-        <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
-        <form
-          onSubmit={(e) => {
-            handleLogin(e).catch(console.error)
-          }}
-        >
-          <div className="mb-4">
-            <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
-              Username
-            </label>
-            <input
-              type="text"
-              id="username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter your username"
-              autoFocus
-              disabled={isLoading}
-            />
-          </div>
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isLoading ? "Signing in..." : "Sign In"}
-          </button>
-        </form>
-      </div>
+      <Card className="w-96">
+        <CardHeader>
+          <CardTitle>Login</CardTitle>
+          <CardDescription>Enter your credentials to access DemoForums</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form onSubmit={(e) => void form.handleSubmit(onSubmit)(e)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="username"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Username</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter your username" {...field} autoFocus />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input type="password" placeholder="Enter your password" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              {form.formState.errors.root && <p className="text-sm text-red-500">{form.formState.errors.root.message}</p>}
+              <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
+                {form.formState.isSubmitting ? "Signing in..." : "Sign In"}
+              </Button>
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
     </div>
   )
 }

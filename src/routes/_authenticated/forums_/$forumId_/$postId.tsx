@@ -1,8 +1,9 @@
-import { createFileRoute, Link } from "@tanstack/react-router"
+import { createFileRoute } from "@tanstack/react-router"
 import { PostInfo } from "./-components/PostInfo"
 import { CommentItem } from "./-components/CommentItem"
 import { api } from "../../../../api/client"
-import { LoadingSpinner } from "../../../../components/ui/LoadingSpinner"
+import { PostDetailSkeleton } from "../../../../components/loading/PostDetailSkeleton"
+import { PostBreadcrumb } from "../../../../components/navigation/PostBreadcrumb"
 
 export const Route = createFileRoute("/_authenticated/forums_/$forumId_/$postId")({
   loader: async ({ params }) => {
@@ -17,7 +18,7 @@ export const Route = createFileRoute("/_authenticated/forums_/$forumId_/$postId"
 
     return { forum, post, comments }
   },
-  pendingComponent: LoadingSpinner,
+  pendingComponent: PostDetailSkeleton,
   pendingMs: 100,
   component: PostDetail,
 })
@@ -28,15 +29,7 @@ function PostDetail() {
 
   return (
     <div>
-      <div className="mb-4 flex items-center gap-2 text-sm">
-        <Link to="/forums" className="text-blue-600 hover:underline">
-          Forums
-        </Link>
-        <span>/</span>
-        <Link to="/forums/$forumId" params={{ forumId }} className="text-blue-600 hover:underline">
-          {forum.name}
-        </Link>
-      </div>
+      <PostBreadcrumb forum={forum} post={post} forumId={forumId} />
 
       <PostInfo post={post} />
 

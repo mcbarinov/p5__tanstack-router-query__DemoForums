@@ -4,7 +4,7 @@ import { sleep } from "./utils"
 
 export interface AuthContext {
   isAuthenticated: boolean
-  login: (username: string) => Promise<void>
+  login: (username: string, password: string) => Promise<void>
   logout: () => Promise<void>
   user: string | null
 }
@@ -36,8 +36,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(null)
   }, [])
 
-  const login = React.useCallback(async (username: string) => {
+  const login = React.useCallback(async (username: string, password: string) => {
     await sleep(500)
+
+    // In a real app, you would validate credentials here
+    // For demo purposes, we'll accept any non-empty password
+    if (!password) {
+      throw new Error("Password is required")
+    }
 
     setStoredUser(username)
     setUser(username)
