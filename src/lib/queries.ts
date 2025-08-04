@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient, queryOptions } from "@tanstack/react-query"
 
 import { api } from "@/lib/api"
-import type { CreatePostRequest } from "@/types"
+import type { CreatePostRequest } from "@/lib/api"
 
 // Query Options - following TanStack example pattern exactly
 export const forumsQueryOptions = () =>

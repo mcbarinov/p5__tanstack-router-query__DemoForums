@@ -1,6 +1,7 @@
 import { http, HttpResponse } from "msw"
 
-import type { User, LoginCredentials, AuthResponse, Forum, Post, Comment, CreatePostRequest } from "@/types"
+import type { User, Forum, Post, Comment } from "@/types"
+import type { LoginCredentials, AuthResponse, CreatePostRequest } from "@/lib/api"
 
 // Mock user database
 const mockUsers: (User & { password: string })[] = [
@@ -320,6 +321,7 @@ export const handlers = [
       return HttpResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
+    const user = activeSessions.get(sessionId)!
     const postRequest = (await request.json()) as CreatePostRequest
 
     // Validate forum exists
@@ -338,7 +340,7 @@ export const handlers = [
       title: postRequest.title,
       content: postRequest.content,
       tags: postRequest.tags,
-      author: postRequest.author,
+      author: user.username,
       createdAt: now,
       updatedAt: now,
     }

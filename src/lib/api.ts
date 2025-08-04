@@ -1,7 +1,29 @@
 import { HTTPError } from "ky"
 
-import type { Forum, Post, Comment, LoginCredentials, AuthResponse, CreatePostRequest } from "@/types"
+import type { Forum, Post, Comment } from "@/types"
 import { httpClient } from "@/lib/http-client"
+
+// API Request/Response Types
+export interface LoginCredentials {
+  username: string
+  password: string
+}
+
+export interface AuthResponse {
+  user: {
+    id: number
+    username: string
+    role: "admin" | "user"
+  }
+  sessionId: string
+}
+
+export interface CreatePostRequest {
+  forumId: number
+  title: string
+  content: string
+  tags: string[]
+}
 
 export const api = {
   // Auth endpoints

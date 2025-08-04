@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import type { CreatePostRequest } from "@/types"
+import type { CreatePostRequest } from "@/lib/api"
 
 export const Route = createFileRoute("/_authenticated/forums_/$forumId_/new")({
   params: {
@@ -61,7 +61,6 @@ function NewPost() {
             .map((tag) => tag.trim())
             .filter(Boolean)
         : [],
-      author: user.username,
     }
 
     createPostMutation.mutate(createPostRequest, {

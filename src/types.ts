@@ -1,3 +1,4 @@
+// Domain Models
 export type Category = "Technology" | "Science" | "Art"
 
 export interface Forum {
@@ -33,22 +34,4 @@ export interface User {
   id: number
   username: string
   role: Role
-}
-
-export interface LoginCredentials {
-  username: string
-  password: string
-}
-
-export interface AuthResponse {
-  user: User
-  sessionId: string
-}
-
-export interface CreatePostRequest {
-  forumId: number
-  title: string
-  content: string
-  tags: string[]
-  author: string
 }
