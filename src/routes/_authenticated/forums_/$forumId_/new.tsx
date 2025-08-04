@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
 import { useForm } from "react-hook-form"
 
-import { api } from "@/lib/api"
+import { forumQueryOptions, useCreatePostMutation, useForumQuery } from "@/lib/queries"
 import { useAuth } from "@/auth"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -11,15 +11,9 @@ import { Textarea } from "@/components/ui/textarea"
 import type { CreatePostRequest } from "@/types"
 
 export const Route = createFileRoute("/_authenticated/forums_/$forumId_/new")({
-  loader: async ({ params }) => {
+  loader: ({ context: { queryClient }, params }) => {
     const forumId = parseInt(params.forumId)
-    const forum = await api.getForum(forumId)
-
-    if (!forum) {
-      throw new Error("Forum not found")
-    }
-
-    return { forum }
+    return queryClient.ensureQueryData(forumQueryOptions(forumId))
   },
   component: NewPost,
 })
@@ -32,9 +26,11 @@ interface FormData {
 
 function NewPost() {
   const { forumId } = Route.useParams()
-  const { forum } = Route.useLoaderData()
+  const forumId_number = parseInt(forumId)
+  const { data: forum } = useForumQuery(forumId_number)
   const { user } = useAuth()
   const navigate = useNavigate()
+  const createPostMutation = useCreatePostMutation()
 
   const form = useForm<FormData>({
     defaultValues: {
@@ -44,7 +40,7 @@ function NewPost() {
     },
   })
 
-  const onSubmit = async (data: FormData) => {
+  const onSubmit = (data: FormData) => {
     if (!user) return
 
     const createPostRequest: CreatePostRequest = {
@@ -60,15 +56,17 @@ function NewPost() {
       author: user.username,
     }
 
-    try {
-      const newPost = await api.createPost(createPostRequest)
-      await navigate({
-        to: "/forums/$forumId/$postId",
-        params: { forumId, postId: newPost.id.toString() },
-      })
-    } catch (error) {
-      console.error("Failed to create post:", error)
-    }
+    createPostMutation.mutate(createPostRequest, {
+      onSuccess: (newPost) => {
+        void navigate({
+          to: "/forums/$forumId/$postId",
+          params: { forumId, postId: newPost.id.toString() },
+        })
+      },
+      onError: (error) => {
+        console.error("Failed to create post:", error)
+      },
+    })
   }
 
   return (
@@ -133,8 +131,8 @@ function NewPost() {
               />
 
               <div className="flex gap-3 pt-4">
-                <Button type="submit" disabled={form.formState.isSubmitting}>
-                  {form.formState.isSubmitting ? "Creating..." : "Create Post"}
+                <Button type="submit" disabled={createPostMutation.isPending}>
+                  {createPostMutation.isPending ? "Creating..." : "Create Post"}
                 </Button>
                 <Button
                   type="button"

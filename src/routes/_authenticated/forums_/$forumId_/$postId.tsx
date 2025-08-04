@@ -1,6 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router"
 
-import { api } from "@/lib/api"
+import {
+  forumQueryOptions,
+  postQueryOptions,
+  postCommentsQueryOptions,
+  useForumQuery,
+  usePostQuery,
+  usePostCommentsQuery,
+} from "@/lib/queries"
 import { PostDetailSkeleton } from "@/components/loading/PostDetailSkeleton"
 import { PostBreadcrumb } from "@/components/navigation/PostBreadcrumb"
 
@@ -8,11 +15,15 @@ import { PostInfo } from "./-components/PostInfo"
 import { CommentItem } from "./-components/CommentItem"
 
 export const Route = createFileRoute("/_authenticated/forums_/$forumId_/$postId")({
-  loader: async ({ params }) => {
+  loader: async ({ context: { queryClient }, params }) => {
     const postId = parseInt(params.postId)
     const forumId = parseInt(params.forumId)
 
-    const [forum, post, comments] = await Promise.all([api.getForum(forumId), api.getPost(postId), api.getCommentsByPost(postId)])
+    const [forum, post, comments] = await Promise.all([
+      queryClient.ensureQueryData(forumQueryOptions(forumId)),
+      queryClient.ensureQueryData(postQueryOptions(postId)),
+      queryClient.ensureQueryData(postCommentsQueryOptions(postId)),
+    ])
 
     if (!forum || !post) {
       throw new Error("Post or forum not found")
@@ -26,8 +37,12 @@ export const Route = createFileRoute("/_authenticated/forums_/$forumId_/$postId"
 })
 
 function PostDetail() {
-  const { forumId } = Route.useParams()
-  const { forum, post, comments } = Route.useLoaderData()
+  const { forumId, postId } = Route.useParams()
+  const forumId_number = parseInt(forumId)
+  const postId_number = parseInt(postId)
+  const { data: forum } = useForumQuery(forumId_number)
+  const { data: post } = usePostQuery(postId_number)
+  const { data: comments } = usePostCommentsQuery(postId_number)
 
   return (
     <div>

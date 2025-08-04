@@ -1,22 +1,19 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
 
-import { api } from "@/lib/api"
+import { forumsQueryOptions, useForumsQuery } from "@/lib/queries"
 import { ForumsListSkeleton } from "@/components/loading/ForumsListSkeleton"
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 
 export const Route = createFileRoute("/_authenticated/forums")({
-  loader: async () => {
-    const forums = await api.getForums()
-    return { forums }
-  },
+  loader: ({ context: { queryClient } }) => queryClient.ensureQueryData(forumsQueryOptions),
   pendingComponent: ForumsListSkeleton,
   pendingMs: 100,
   component: ForumsList,
 })
 
 function ForumsList() {
-  const { forums } = Route.useLoaderData()
+  const { data: forums } = useForumsQuery()
 
   return (
     <div>

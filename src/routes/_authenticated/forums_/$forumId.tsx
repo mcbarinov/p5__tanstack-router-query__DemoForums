@@ -1,15 +1,19 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
 
-import { api } from "@/lib/api"
+import { forumQueryOptions, forumPostsQueryOptions, useForumQuery, useForumPostsQuery } from "@/lib/queries"
 import { PostsListSkeleton } from "@/components/loading/PostsListSkeleton"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 
 export const Route = createFileRoute("/_authenticated/forums_/$forumId")({
-  loader: async ({ params }) => {
+  loader: async ({ context: { queryClient }, params }) => {
     const forumId = parseInt(params.forumId)
-    const [forum, posts] = await Promise.all([api.getForum(forumId), api.getPostsByForum(forumId)])
+
+    const [forum, posts] = await Promise.all([
+      queryClient.ensureQueryData(forumQueryOptions(forumId)),
+      queryClient.ensureQueryData(forumPostsQueryOptions(forumId)),
+    ])
 
     if (!forum) {
       throw new Error("Forum not found")
@@ -24,7 +28,9 @@ export const Route = createFileRoute("/_authenticated/forums_/$forumId")({
 
 function ForumPosts() {
   const { forumId } = Route.useParams()
-  const { forum, posts } = Route.useLoaderData()
+  const forumId_number = parseInt(forumId)
+  const { data: forum } = useForumQuery(forumId_number)
+  const { data: posts } = useForumPostsQuery(forumId_number)
 
   return (
     <div>
