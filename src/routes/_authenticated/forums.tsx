@@ -20,7 +20,7 @@ function ForumsList() {
       <h2 className="text-2xl font-bold mb-4">Forums</h2>
       <div className="space-y-2">
         {forums.map((forum) => (
-          <Link key={forum.id} to="/forums/$forumId" params={{ forumId: forum.id.toString() }} className="block">
+          <Link key={forum.id} to="/forums/$forumId" params={{ forumId: forum.id }} className="block">
             <Card className="hover:shadow-md transition-shadow cursor-pointer">
               <CardHeader>
                 <div className="flex items-center justify-between">

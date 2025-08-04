@@ -7,12 +7,19 @@ import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 
 export const Route = createFileRoute("/_authenticated/forums_/$forumId")({
+  params: {
+    parse: (rawParams) => {
+      const forumId = parseInt(rawParams.forumId)
+      if (isNaN(forumId) || forumId <= 0) {
+        throw new Error(`Invalid forum ID: ${rawParams.forumId}`)
+      }
+      return { forumId }
+    },
+  },
   loader: async ({ context: { queryClient }, params }) => {
-    const forumId = parseInt(params.forumId)
-
     const [forum, posts] = await Promise.all([
-      queryClient.ensureQueryData(forumQueryOptions(forumId)),
-      queryClient.ensureQueryData(forumPostsQueryOptions(forumId)),
+      queryClient.ensureQueryData(forumQueryOptions(params.forumId)),
+      queryClient.ensureQueryData(forumPostsQueryOptions(params.forumId)),
     ])
 
     if (!forum) {
@@ -28,9 +35,8 @@ export const Route = createFileRoute("/_authenticated/forums_/$forumId")({
 
 function ForumPosts() {
   const { forumId } = Route.useParams()
-  const forumId_number = parseInt(forumId)
-  const { data: forum } = useForumQuery(forumId_number)
-  const { data: posts } = useForumPostsQuery(forumId_number)
+  const { data: forum } = useForumQuery(forumId)
+  const { data: posts } = useForumPostsQuery(forumId)
 
   return (
     <div>
@@ -61,7 +67,7 @@ function ForumPosts() {
               <TableCell>
                 <Link
                   to="/forums/$forumId/$postId"
-                  params={{ forumId, postId: post.id.toString() }}
+                  params={{ forumId, postId: post.id }}
                   className="text-blue-600 hover:underline"
                 >
                   {post.title}

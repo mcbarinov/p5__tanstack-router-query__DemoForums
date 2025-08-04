@@ -13,7 +13,7 @@ import type { Forum, Post } from "@/types"
 interface PostBreadcrumbProps {
   forum: Forum
   post: Post
-  forumId: string
+  forumId: number
 }
 
 export function PostBreadcrumb({ forum, post, forumId }: PostBreadcrumbProps) {

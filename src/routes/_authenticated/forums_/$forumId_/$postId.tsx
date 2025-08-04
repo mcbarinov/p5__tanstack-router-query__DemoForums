@@ -15,14 +15,26 @@ import { PostInfo } from "./-components/PostInfo"
 import { CommentItem } from "./-components/CommentItem"
 
 export const Route = createFileRoute("/_authenticated/forums_/$forumId_/$postId")({
-  loader: async ({ context: { queryClient }, params }) => {
-    const postId = parseInt(params.postId)
-    const forumId = parseInt(params.forumId)
+  params: {
+    parse: (rawParams) => {
+      const forumId = parseInt(rawParams.forumId)
+      const postId = parseInt(rawParams.postId)
 
+      if (isNaN(forumId) || forumId <= 0) {
+        throw new Error(`Invalid forum ID: ${rawParams.forumId}`)
+      }
+      if (isNaN(postId) || postId <= 0) {
+        throw new Error(`Invalid post ID: ${rawParams.postId}`)
+      }
+
+      return { forumId, postId }
+    },
+  },
+  loader: async ({ context: { queryClient }, params }) => {
     const [forum, post, comments] = await Promise.all([
-      queryClient.ensureQueryData(forumQueryOptions(forumId)),
-      queryClient.ensureQueryData(postQueryOptions(postId)),
-      queryClient.ensureQueryData(postCommentsQueryOptions(postId)),
+      queryClient.ensureQueryData(forumQueryOptions(params.forumId)),
+      queryClient.ensureQueryData(postQueryOptions(params.postId)),
+      queryClient.ensureQueryData(postCommentsQueryOptions(params.postId)),
     ])
 
     if (!forum || !post) {
@@ -38,11 +50,9 @@ export const Route = createFileRoute("/_authenticated/forums_/$forumId_/$postId"
 
 function PostDetail() {
   const { forumId, postId } = Route.useParams()
-  const forumId_number = parseInt(forumId)
-  const postId_number = parseInt(postId)
-  const { data: forum } = useForumQuery(forumId_number)
-  const { data: post } = usePostQuery(postId_number)
-  const { data: comments } = usePostCommentsQuery(postId_number)
+  const { data: forum } = useForumQuery(forumId)
+  const { data: post } = usePostQuery(postId)
+  const { data: comments } = usePostCommentsQuery(postId)
 
   return (
     <div>

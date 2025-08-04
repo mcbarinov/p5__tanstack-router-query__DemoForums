@@ -11,9 +11,17 @@ import { Textarea } from "@/components/ui/textarea"
 import type { CreatePostRequest } from "@/types"
 
 export const Route = createFileRoute("/_authenticated/forums_/$forumId_/new")({
+  params: {
+    parse: (rawParams) => {
+      const forumId = parseInt(rawParams.forumId)
+      if (isNaN(forumId) || forumId <= 0) {
+        throw new Error(`Invalid forum ID: ${rawParams.forumId}`)
+      }
+      return { forumId }
+    },
+  },
   loader: ({ context: { queryClient }, params }) => {
-    const forumId = parseInt(params.forumId)
-    return queryClient.ensureQueryData(forumQueryOptions(forumId))
+    return queryClient.ensureQueryData(forumQueryOptions(params.forumId))
   },
   component: NewPost,
 })
@@ -26,8 +34,7 @@ interface FormData {
 
 function NewPost() {
   const { forumId } = Route.useParams()
-  const forumId_number = parseInt(forumId)
-  const { data: forum } = useForumQuery(forumId_number)
+  const { data: forum } = useForumQuery(forumId)
   const { user } = useAuth()
   const navigate = useNavigate()
   const createPostMutation = useCreatePostMutation()
@@ -44,7 +51,7 @@ function NewPost() {
     if (!user) return
 
     const createPostRequest: CreatePostRequest = {
-      forumId: parseInt(forumId),
+      forumId,
       title: data.title,
       content: data.content,
       tags: data.tags
@@ -60,7 +67,7 @@ function NewPost() {
       onSuccess: (newPost) => {
         void navigate({
           to: "/forums/$forumId/$postId",
-          params: { forumId, postId: newPost.id.toString() },
+          params: { forumId, postId: newPost.id },
         })
       },
       onError: (error) => {
