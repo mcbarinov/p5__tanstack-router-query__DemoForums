@@ -1,6 +1,7 @@
 import { StrictMode } from "react"
 import ReactDOM from "react-dom/client"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
 
 import { AuthProvider } from "@/auth"
 import { App } from "@/App"
@@ -11,6 +12,8 @@ const queryClient = new QueryClient({
     queries: {
       staleTime: 0, // Always fetch fresh data on navigation
       refetchOnWindowFocus: false,
+      refetchOnMount: true, // Only refetch when component mounts
+      refetchOnReconnect: false, // Don't refetch on network reconnect
       retry: 1,
     },
     mutations: {
@@ -38,6 +41,7 @@ async function startApp() {
           <AuthProvider>
             <App />
           </AuthProvider>
+          <ReactQueryDevtools initialIsOpen={false} />
         </QueryClientProvider>
       </StrictMode>
     )

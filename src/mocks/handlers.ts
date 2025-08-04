@@ -1,4 +1,4 @@
-import { http, HttpResponse } from "msw"
+import { http, HttpResponse, type JsonBodyType } from "msw"
 
 import type { User, Forum, Post, Comment } from "@/types"
 import type { LoginCredentials, AuthResponse, CreatePostRequest, CreateCommentRequest } from "@/lib/api"
@@ -225,6 +225,17 @@ function getSessionId(request: Request): string | null {
   return authHeader.substring(7) // Remove "Bearer " prefix
 }
 
+// Helper to validate session and return 401 if invalid
+function validateSession(request: Request): HttpResponse<JsonBodyType> | null {
+  const sessionId = getSessionId(request)
+
+  if (!sessionId || !activeSessions.has(sessionId)) {
+    return HttpResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+
+  return null // No error, session is valid
+}
+
 export const handlers = [
   // Login endpoint
   http.post("/api/auth/login", async ({ request }) => {
@@ -258,6 +269,9 @@ export const handlers = [
 
   // Logout endpoint
   http.post("/api/auth/logout", ({ request }) => {
+    const validationError = validateSession(request)
+    if (validationError) return validationError
+
     const sessionId = getSessionId(request)
 
     if (sessionId && activeSessions.has(sessionId)) {
@@ -268,12 +282,18 @@ export const handlers = [
   }),
 
   // Get all forums
-  http.get("/api/forums", () => {
+  http.get("/api/forums", ({ request }) => {
+    const validationError = validateSession(request)
+    if (validationError) return validationError
+
     return HttpResponse.json(mockForums)
   }),
 
   // Get a single forum
-  http.get("/api/forums/:id", ({ params }) => {
+  http.get("/api/forums/:id", ({ params, request }) => {
+    const validationError = validateSession(request)
+    if (validationError) return validationError
+
     const forumId = parseInt(params.id as string)
     const forum = mockForums.find((f) => f.id === forumId)
 
@@ -285,7 +305,10 @@ export const handlers = [
   }),
 
   // Get posts by forum
-  http.get("/api/forums/:forumId/posts", ({ params }) => {
+  http.get("/api/forums/:forumId/posts", ({ params, request }) => {
+    const validationError = validateSession(request)
+    if (validationError) return validationError
+
     const forumId = parseInt(params.forumId as string)
     const posts = mockPosts.filter((p) => p.forumId === forumId)
 
@@ -293,7 +316,10 @@ export const handlers = [
   }),
 
   // Get a single post
-  http.get("/api/posts/:id", ({ params }) => {
+  http.get("/api/posts/:id", ({ params, request }) => {
+    const validationError = validateSession(request)
+    if (validationError) return validationError
+
     const postId = parseInt(params.id as string)
     const post = mockPosts.find((p) => p.id === postId)
 
@@ -305,7 +331,10 @@ export const handlers = [
   }),
 
   // Get comments by post
-  http.get("/api/posts/:postId/comments", ({ params }) => {
+  http.get("/api/posts/:postId/comments", ({ params, request }) => {
+    const validationError = validateSession(request)
+    if (validationError) return validationError
+
     const postId = parseInt(params.postId as string)
     const comments = mockComments.filter((c) => c.postId === postId)
 
@@ -314,13 +343,10 @@ export const handlers = [
 
   // Create a new post
   http.post("/api/posts", async ({ request }) => {
+    const validationError = validateSession(request)
+    if (validationError) return validationError
+
     const sessionId = getSessionId(request)
-
-    // Check if user is authenticated
-    if (!sessionId || !activeSessions.has(sessionId)) {
-      return HttpResponse.json({ error: "Unauthorized" }, { status: 401 })
-    }
-
     const user = activeSessions.get(sessionId)!
     const postRequest = (await request.json()) as CreatePostRequest
 
@@ -351,13 +377,10 @@ export const handlers = [
 
   // Create a new comment
   http.post("/api/comments", async ({ request }) => {
+    const validationError = validateSession(request)
+    if (validationError) return validationError
+
     const sessionId = getSessionId(request)
-
-    // Check if user is authenticated
-    if (!sessionId || !activeSessions.has(sessionId)) {
-      return HttpResponse.json({ error: "Unauthorized" }, { status: 401 })
-    }
-
     const user = activeSessions.get(sessionId)!
     const commentRequest = (await request.json()) as CreateCommentRequest
 
