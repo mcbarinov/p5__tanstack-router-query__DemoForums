@@ -8,12 +8,8 @@ export const forumsQueryOptions = () =>
   queryOptions({
     queryKey: ["forums"],
     queryFn: () => api.getForums(),
-  })
-
-export const forumQueryOptions = (id: number) =>
-  queryOptions({
-    queryKey: ["forums", id],
-    queryFn: () => api.getForum(id),
+    staleTime: Infinity, // Never consider forums data stale
+    gcTime: Infinity, // Never remove from memory - permanent cache
   })
 
 export const forumPostsQueryOptions = (forumId: number) =>
@@ -61,4 +57,13 @@ export const useCreateCommentMutation = () => {
       })
     },
   })
+}
+
+// Refresh Forums Hook
+export const useRefreshForums = () => {
+  const queryClient = useQueryClient()
+
+  return () => {
+    void queryClient.refetchQueries({ queryKey: ["forums"] })
+  }
 }

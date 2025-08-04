@@ -289,21 +289,6 @@ export const handlers = [
     return HttpResponse.json(mockForums)
   }),
 
-  // Get a single forum
-  http.get("/api/forums/:id", ({ params, request }) => {
-    const validationError = validateSession(request)
-    if (validationError) return validationError
-
-    const forumId = parseInt(params.id as string)
-    const forum = mockForums.find((f) => f.id === forumId)
-
-    if (!forum) {
-      return HttpResponse.json({ error: "Forum not found" }, { status: 404 })
-    }
-
-    return HttpResponse.json(forum)
-  }),
-
   // Get posts by forum
   http.get("/api/forums/:forumId/posts", ({ params, request }) => {
     const validationError = validateSession(request)
@@ -346,7 +331,7 @@ export const handlers = [
     const validationError = validateSession(request)
     if (validationError) return validationError
 
-    const sessionId = getSessionId(request)
+    const sessionId = getSessionId(request)!
     const user = activeSessions.get(sessionId)!
     const postRequest = (await request.json()) as CreatePostRequest
 
@@ -380,7 +365,7 @@ export const handlers = [
     const validationError = validateSession(request)
     if (validationError) return validationError
 
-    const sessionId = getSessionId(request)
+    const sessionId = getSessionId(request)!
     const user = activeSessions.get(sessionId)!
     const commentRequest = (await request.json()) as CreateCommentRequest
 

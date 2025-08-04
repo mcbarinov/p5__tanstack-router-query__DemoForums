@@ -53,10 +53,6 @@ export const api = {
     return httpClient.get("forums").json<Forum[]>()
   },
 
-  async getForum(id: number): Promise<Forum> {
-    return httpClient.get(`forums/${id}`).json<Forum>()
-  },
-
   async getPostsByForum(forumId: number): Promise<Post[]> {
     return httpClient.get(`forums/${forumId}/posts`).json<Post[]>()
   },

@@ -2,6 +2,7 @@ import { createFileRoute, Outlet, redirect } from "@tanstack/react-router"
 
 import { Header } from "@/components/layout/Header"
 import { Footer } from "@/components/layout/Footer"
+import { forumsQueryOptions } from "@/lib/queries"
 
 export const Route = createFileRoute("/_authenticated")({
   beforeLoad: ({ context, location }) => {
@@ -14,6 +15,9 @@ export const Route = createFileRoute("/_authenticated")({
         },
       })
     }
+    
+    // Preload forums data for all authenticated routes
+    return context.queryClient.ensureQueryData(forumsQueryOptions())
   },
   component: AuthLayout,
 })

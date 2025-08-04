@@ -11,14 +11,20 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { useRefreshForums } from "@/lib/queries"
 
 export function Header() {
   const auth = useAuth()
   const navigate = useNavigate()
+  const refreshForums = useRefreshForums()
 
   const handleLogout = async () => {
     await auth.logout()
     await navigate({ to: "/login", search: { redirect: undefined } })
+  }
+
+  const handleRefreshForums = () => {
+    refreshForums()
   }
 
   const userInitials = auth.user
@@ -49,6 +55,8 @@ export function Header() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>{auth.user?.username}</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleRefreshForums}>Refresh Forums</DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => void handleLogout()}>Logout</DropdownMenuItem>
             </DropdownMenuContent>

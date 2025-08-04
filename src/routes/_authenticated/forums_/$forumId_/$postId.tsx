@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router"
 import { useSuspenseQuery } from "@tanstack/react-query"
 
-import { forumQueryOptions, postQueryOptions, postCommentsQueryOptions } from "@/lib/queries"
+import { forumsQueryOptions, postQueryOptions, postCommentsQueryOptions } from "@/lib/queries"
 import { PostDetailSkeleton } from "@/components/loading/PostDetailSkeleton"
 import { PostBreadcrumb } from "@/components/navigation/PostBreadcrumb"
 
@@ -25,13 +25,11 @@ export const Route = createFileRoute("/_authenticated/forums_/$forumId_/$postId"
       return { forumId, postId }
     },
   },
-  loader: async ({ context: { queryClient }, params }) => {
-    await Promise.all([
-      queryClient.ensureQueryData(forumQueryOptions(params.forumId)),
+  loader: ({ context: { queryClient }, params }) =>
+    Promise.all([
       queryClient.ensureQueryData(postQueryOptions(params.postId)),
       queryClient.ensureQueryData(postCommentsQueryOptions(params.postId)),
-    ])
-  },
+    ]),
   pendingComponent: PostDetailSkeleton,
   pendingMs: 100,
   component: PostDetail,
@@ -39,9 +37,15 @@ export const Route = createFileRoute("/_authenticated/forums_/$forumId_/$postId"
 
 function PostDetail() {
   const { forumId, postId } = Route.useParams()
-  const { data: forum } = useSuspenseQuery(forumQueryOptions(forumId))
+  const { data: forums } = useSuspenseQuery(forumsQueryOptions())
   const { data: post } = useSuspenseQuery(postQueryOptions(postId))
   const { data: comments } = useSuspenseQuery(postCommentsQueryOptions(postId))
+
+  const forum = forums.find((f) => f.id === forumId)
+
+  if (!forum) {
+    throw new Error(`Forum not found: ${forumId}`)
+  }
 
   return (
     <div>

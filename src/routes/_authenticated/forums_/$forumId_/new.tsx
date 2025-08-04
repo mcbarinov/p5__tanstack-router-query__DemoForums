@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 
-import { forumQueryOptions, useCreatePostMutation } from "@/lib/queries"
+import { forumsQueryOptions, useCreatePostMutation } from "@/lib/queries"
 import { useAuth } from "@/auth"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -23,9 +23,6 @@ export const Route = createFileRoute("/_authenticated/forums_/$forumId_/new")({
       return { forumId }
     },
   },
-  loader: ({ context: { queryClient }, params }) => {
-    return queryClient.ensureQueryData(forumQueryOptions(params.forumId))
-  },
   component: NewPost,
 })
 
@@ -37,10 +34,16 @@ const formSchema = z.object({
 
 function NewPost() {
   const { forumId } = Route.useParams()
-  const { data: forum } = useSuspenseQuery(forumQueryOptions(forumId))
+  const { data: forums } = useSuspenseQuery(forumsQueryOptions())
   const { user } = useAuth()
   const navigate = useNavigate()
   const createPostMutation = useCreatePostMutation()
+
+  const forum = forums.find((f) => f.id === forumId)
+
+  if (!forum) {
+    throw new Error(`Forum not found: ${forumId}`)
+  }
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
