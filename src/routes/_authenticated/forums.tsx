@@ -1,19 +1,20 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
+import { useSuspenseQuery } from "@tanstack/react-query"
 
-import { forumsQueryOptions, useForumsQuery } from "@/lib/queries"
+import { forumsQueryOptions } from "@/lib/queries"
 import { ForumsListSkeleton } from "@/components/loading/ForumsListSkeleton"
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 
 export const Route = createFileRoute("/_authenticated/forums")({
-  loader: ({ context: { queryClient } }) => queryClient.ensureQueryData(forumsQueryOptions),
+  loader: ({ context: { queryClient } }) => queryClient.ensureQueryData(forumsQueryOptions()),
   pendingComponent: ForumsListSkeleton,
   pendingMs: 100,
   component: ForumsList,
 })
 
 function ForumsList() {
-  const { data: forums } = useForumsQuery()
+  const { data: forums } = useSuspenseQuery(forumsQueryOptions())
 
   return (
     <div>

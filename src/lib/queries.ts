@@ -1,13 +1,14 @@
-import { useMutation, useQueryClient, useSuspenseQuery, queryOptions } from "@tanstack/react-query"
+import { useMutation, useQueryClient, queryOptions } from "@tanstack/react-query"
 
 import { api } from "@/lib/api"
-import type { CreatePostRequest, Post } from "@/types"
+import type { CreatePostRequest } from "@/types"
 
-// Query Options
-export const forumsQueryOptions = queryOptions({
-  queryKey: ["forums"],
-  queryFn: () => api.getForums(),
-})
+// Query Options - following TanStack example pattern exactly
+export const forumsQueryOptions = () =>
+  queryOptions({
+    queryKey: ["forums"],
+    queryFn: () => api.getForums(),
+  })
 
 export const forumQueryOptions = (id: number) =>
   queryOptions({
@@ -33,43 +34,16 @@ export const postCommentsQueryOptions = (postId: number) =>
     queryFn: () => api.getCommentsByPost(postId),
   })
 
-// Query Hooks
-export function useForumsQuery() {
-  return useSuspenseQuery(forumsQueryOptions)
-}
-
-export function useForumQuery(id: number) {
-  return useSuspenseQuery(forumQueryOptions(id))
-}
-
-export function useForumPostsQuery(forumId: number) {
-  return useSuspenseQuery(forumPostsQueryOptions(forumId))
-}
-
-export function usePostQuery(id: number) {
-  return useSuspenseQuery(postQueryOptions(id))
-}
-
-export function usePostCommentsQuery(postId: number) {
-  return useSuspenseQuery(postCommentsQueryOptions(postId))
-}
-
-// Mutation Hooks
-export function useCreatePostMutation() {
+// Mutation Hooks with proper invalidation
+export const useCreatePostMutation = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: (request: CreatePostRequest) => api.createPost(request),
-    onSuccess: (newPost: Post, variables: CreatePostRequest) => {
-      // Invalidate and refetch forum posts to show the new post
+    onSuccess: (_, variables: CreatePostRequest) => {
+      // Invalidate all related queries
       void queryClient.invalidateQueries({
         queryKey: ["forums", variables.forumId, "posts"],
-      })
-
-      // Optionally add the new post to the cache optimistically
-      queryClient.setQueryData<Post[]>(["forums", variables.forumId, "posts"], (oldPosts) => {
-        if (!oldPosts) return [newPost]
-        return [newPost, ...oldPosts]
       })
     },
   })

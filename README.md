@@ -7,6 +7,7 @@ A demonstration forum application built with modern React and TypeScript stack.
 - **React 19** - UI library
 - **TypeScript** - Static typing
 - **TanStack Router** - File-based routing with loader support
+- **TanStack Query** - Powerful data synchronization for React
 - **Tailwind CSS v4** - Utility-first CSS framework
 - **Vite** - Fast bundler and dev server
 - **ESLint + Prettier** - Code linting and formatting
@@ -19,6 +20,7 @@ A demonstration forum application built with modern React and TypeScript stack.
 src/
 ├── lib/
 │   ├── api.ts             # Clean API with ONLY HTTP requests
+│   ├── queries.ts         # TanStack Query options and mutations
 │   ├── http-client.ts     # HTTP client configuration (Ky setup)
 │   ├── auth-storage.ts    # Authentication storage utilities
 │   └── utils.ts           # General utilities (cn function)
@@ -198,6 +200,85 @@ We use TanStack Router's loader pattern for prefetching data before component re
 - No UI jumps
 - Parallel data loading
 - Automatic error handling
+
+### TanStack Query Integration
+
+The project follows best practices for TanStack Router + Query integration, inspired by the official TanStack examples.
+
+**Query Options Pattern:**
+
+All query configurations are centralized in `src/lib/queries.ts`:
+
+```typescript
+// Query options with function wrappers for better composability
+export const forumsQueryOptions = () =>
+  queryOptions({
+    queryKey: ["forums"],
+    queryFn: () => api.getForums(),
+  })
+
+export const forumQueryOptions = (id: number) =>
+  queryOptions({
+    queryKey: ["forums", id],
+    queryFn: () => api.getForum(id),
+  })
+```
+
+**Route Integration:**
+
+Routes use `ensureQueryData` in loaders to prefetch data:
+
+```typescript
+export const Route = createFileRoute("/_authenticated/forums")({
+  loader: ({ context: { queryClient } }) => queryClient.ensureQueryData(forumsQueryOptions()),
+  component: ForumsList,
+})
+```
+
+**Component Usage:**
+
+Components use `useSuspenseQuery` directly since data is guaranteed to be loaded:
+
+```typescript
+function ForumsList() {
+  const { data: forums } = useSuspenseQuery(forumsQueryOptions())
+  // Data is always available here - no loading states needed
+}
+```
+
+**Mutation Patterns:**
+
+Mutations properly invalidate related queries to keep data fresh:
+
+```typescript
+export const useCreatePostMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (request: CreatePostRequest) => api.createPost(request),
+    onSuccess: (_, variables) => {
+      // Invalidate all related queries for fresh data
+      void queryClient.invalidateQueries({
+        queryKey: ["forums", variables.forumId, "posts"],
+      })
+      void queryClient.invalidateQueries({
+        queryKey: ["forums", variables.forumId],
+      })
+      void queryClient.invalidateQueries({
+        queryKey: ["forums"],
+      })
+    },
+  })
+}
+```
+
+**Architecture Benefits:**
+
+- **Prefetched Data**: Routes load data before rendering (no loading spinners in components)
+- **Centralized Queries**: All query logic in one place for consistency
+- **Type Safety**: Full TypeScript support with proper inference
+- **Cache Management**: Automatic invalidation keeps data synchronized
+- **Parallel Loading**: Multiple queries load simultaneously in route loaders
 
 ### Loading States
 

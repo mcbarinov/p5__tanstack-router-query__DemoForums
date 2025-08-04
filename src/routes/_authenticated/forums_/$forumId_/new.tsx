@@ -1,7 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
+import { useSuspenseQuery } from "@tanstack/react-query"
 import { useForm } from "react-hook-form"
 
-import { forumQueryOptions, useCreatePostMutation, useForumQuery } from "@/lib/queries"
+import { forumQueryOptions, useCreatePostMutation } from "@/lib/queries"
 import { useAuth } from "@/auth"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -34,7 +35,7 @@ interface FormData {
 
 function NewPost() {
   const { forumId } = Route.useParams()
-  const { data: forum } = useForumQuery(forumId)
+  const { data: forum } = useSuspenseQuery(forumQueryOptions(forumId))
   const { user } = useAuth()
   const navigate = useNavigate()
   const createPostMutation = useCreatePostMutation()
