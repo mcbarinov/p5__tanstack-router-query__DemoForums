@@ -7,6 +7,7 @@ import { PostBreadcrumb } from "@/components/navigation/PostBreadcrumb"
 
 import { PostInfo } from "./-components/PostInfo"
 import { CommentItem } from "./-components/CommentItem"
+import { CommentForm } from "./-components/CommentForm"
 
 export const Route = createFileRoute("/_authenticated/forums_/$forumId_/$postId")({
   params: {
@@ -48,12 +49,16 @@ function PostDetail() {
 
       <PostInfo post={post} />
 
+      <CommentForm postId={postId} />
+
       <div className="space-y-4">
         <h2 className="text-xl font-bold">Comments ({comments.length})</h2>
         {comments.map((comment) => (
           <CommentItem key={comment.id} comment={comment} />
         ))}
       </div>
+
+      
     </div>
   )
 }

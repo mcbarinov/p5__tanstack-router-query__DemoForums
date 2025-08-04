@@ -33,6 +33,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await api.logout()
     clearAuthData()
     setUser(null)
+    // Emit logout event for navigation
+    window.dispatchEvent(new CustomEvent("auth:logout"))
   }, [])
 
   const login = React.useCallback(async (username: string, password: string) => {

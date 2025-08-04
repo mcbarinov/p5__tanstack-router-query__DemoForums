@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient, queryOptions } from "@tanstack/react-query"
 
 import { api } from "@/lib/api"
-import type { CreatePostRequest } from "@/lib/api"
+import type { CreatePostRequest, CreateCommentRequest } from "@/lib/api"
 
 // Query Options - following TanStack example pattern exactly
 export const forumsQueryOptions = () =>
@@ -44,6 +44,20 @@ export const useCreatePostMutation = () => {
       // Invalidate all related queries
       void queryClient.invalidateQueries({
         queryKey: ["forums", variables.forumId, "posts"],
+      })
+    },
+  })
+}
+
+export const useCreateCommentMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (request: CreateCommentRequest) => api.createComment(request),
+    onSuccess: (_, variables: CreateCommentRequest) => {
+      // Invalidate comments for the post
+      void queryClient.invalidateQueries({
+        queryKey: ["posts", variables.postId, "comments"],
       })
     },
   })

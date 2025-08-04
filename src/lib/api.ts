@@ -25,6 +25,11 @@ export interface CreatePostRequest {
   tags: string[]
 }
 
+export interface CreateCommentRequest {
+  postId: number
+  content: string
+}
+
 export const api = {
   // Auth endpoints
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
@@ -66,5 +71,9 @@ export const api = {
 
   async createPost(request: CreatePostRequest): Promise<Post> {
     return httpClient.post("posts", { json: request }).json<Post>()
+  },
+
+  async createComment(request: CreateCommentRequest): Promise<Comment> {
+    return httpClient.post("comments", { json: request }).json<Comment>()
   },
 }

@@ -1,7 +1,7 @@
 import { http, HttpResponse } from "msw"
 
 import type { User, Forum, Post, Comment } from "@/types"
-import type { LoginCredentials, AuthResponse, CreatePostRequest } from "@/lib/api"
+import type { LoginCredentials, AuthResponse, CreatePostRequest, CreateCommentRequest } from "@/lib/api"
 
 // Mock user database
 const mockUsers: (User & { password: string })[] = [
@@ -347,5 +347,40 @@ export const handlers = [
 
     mockPosts.push(newPost)
     return HttpResponse.json(newPost)
+  }),
+
+  // Create a new comment
+  http.post("/api/comments", async ({ request }) => {
+    const sessionId = getSessionId(request)
+
+    // Check if user is authenticated
+    if (!sessionId || !activeSessions.has(sessionId)) {
+      return HttpResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
+    const user = activeSessions.get(sessionId)!
+    const commentRequest = (await request.json()) as CreateCommentRequest
+
+    // Validate post exists
+    const post = mockPosts.find((p) => p.id === commentRequest.postId)
+    if (!post) {
+      return HttpResponse.json({ error: "Post not found" }, { status: 404 })
+    }
+
+    // Create new comment
+    const newId = Math.max(...mockComments.map((c) => c.id)) + 1
+    const now = new Date()
+
+    const newComment: Comment = {
+      id: newId,
+      postId: commentRequest.postId,
+      content: commentRequest.content,
+      author: user.username,
+      createdAt: now,
+      updatedAt: now,
+    }
+
+    mockComments.push(newComment)
+    return HttpResponse.json(newComment)
   }),
 ]
