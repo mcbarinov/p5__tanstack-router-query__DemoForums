@@ -13,7 +13,10 @@ export function App() {
   useEffect(() => {
     const handleAutoLogout = () => {
       // Navigate to login page when user is automatically logged out
-      void router.navigate({ to: "/login" })
+      void router.navigate({
+        to: "/login",
+        search: { redirect: undefined },
+      })
     }
 
     window.addEventListener("auth:logout", handleAutoLogout)

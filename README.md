@@ -313,22 +313,32 @@ Using Tailwind CSS utility classes:
 
 ### Form Handling
 
-Always use shadcn/ui Form components instead of direct react-hook-form usage for better accessibility and consistency.
+Always use shadcn/ui Form components with Zod validation for better accessibility, consistency, and type safety.
 
-**✅ CORRECT - Use shadcn/ui Form components:**
+**✅ CORRECT - Use shadcn/ui Forms with Zod:**
 
 ```typescript
 import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import * as z from "zod"
+
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 
-const form = useForm<FormData>()
+const formSchema = z.object({
+  title: z.string().min(1, "Title is required"),
+  content: z.string().min(1, "Content is required"),
+})
+
+const form = useForm<z.infer<typeof formSchema>>({
+  resolver: zodResolver(formSchema),
+  defaultValues: { title: "", content: "" },
+})
 
 <Form {...form}>
   <form onSubmit={form.handleSubmit(onSubmit)}>
     <FormField
       control={form.control}
       name="title"
-      rules={{ required: "Title is required" }}
       render={({ field }) => (
         <FormItem>
           <FormLabel>Title</FormLabel>
@@ -342,6 +352,17 @@ const form = useForm<FormData>()
     <Button type="submit">Submit</Button>
   </form>
 </Form>
+```
+
+**❌ AVOID - Inline validation rules:**
+
+```typescript
+// Don't use inline rules - use Zod schema instead
+<FormField
+  name="title"
+  rules={{ required: "Title is required" }} // ❌ Avoid this
+  render={({ field }) => ...}
+/>
 ```
 
 **❌ AVOID - Direct react-hook-form usage:**

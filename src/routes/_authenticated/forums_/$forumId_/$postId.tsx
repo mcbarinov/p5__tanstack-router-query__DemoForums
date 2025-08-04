@@ -57,8 +57,6 @@ function PostDetail() {
           <CommentItem key={comment.id} comment={comment} />
         ))}
       </div>
-
-      
     </div>
   )
 }

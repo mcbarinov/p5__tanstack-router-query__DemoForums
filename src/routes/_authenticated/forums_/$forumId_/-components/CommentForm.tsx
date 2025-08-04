@@ -1,4 +1,6 @@
 import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import * as z from "zod"
 
 import { useCreateCommentMutation } from "@/lib/queries"
 import { Button } from "@/components/ui/button"
@@ -9,12 +11,13 @@ interface CommentFormProps {
   postId: number
 }
 
-interface CommentFormData {
-  content: string
-}
+const formSchema = z.object({
+  content: z.string().min(1, "Comment content is required"),
+})
 
 export function CommentForm({ postId }: CommentFormProps) {
-  const form = useForm<CommentFormData>({
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
     defaultValues: {
       content: "",
     },
@@ -22,7 +25,7 @@ export function CommentForm({ postId }: CommentFormProps) {
 
   const createCommentMutation = useCreateCommentMutation()
 
-  const onSubmit = (data: CommentFormData) => {
+  const onSubmit = (data: z.infer<typeof formSchema>) => {
     createCommentMutation.mutate(
       { postId, content: data.content },
       {
@@ -48,10 +51,6 @@ export function CommentForm({ postId }: CommentFormProps) {
           <FormField
             control={form.control}
             name="content"
-            rules={{
-              required: "Comment content is required",
-              minLength: { value: 1, message: "Comment cannot be empty" },
-            }}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Comment</FormLabel>

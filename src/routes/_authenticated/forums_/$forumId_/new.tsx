@@ -1,6 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
 import { useSuspenseQuery } from "@tanstack/react-query"
 import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import * as z from "zod"
 
 import { forumQueryOptions, useCreatePostMutation } from "@/lib/queries"
 import { useAuth } from "@/auth"
@@ -27,11 +29,11 @@ export const Route = createFileRoute("/_authenticated/forums_/$forumId_/new")({
   component: NewPost,
 })
 
-interface FormData {
-  title: string
-  content: string
-  tags: string
-}
+const formSchema = z.object({
+  title: z.string().min(1, "Title is required"),
+  content: z.string().min(1, "Content is required"),
+  tags: z.string().optional(),
+})
 
 function NewPost() {
   const { forumId } = Route.useParams()
@@ -40,7 +42,8 @@ function NewPost() {
   const navigate = useNavigate()
   const createPostMutation = useCreatePostMutation()
 
-  const form = useForm<FormData>({
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
     defaultValues: {
       title: "",
       content: "",
@@ -48,7 +51,7 @@ function NewPost() {
     },
   })
 
-  const onSubmit = (data: FormData) => {
+  const onSubmit = (data: z.infer<typeof formSchema>) => {
     if (!user) return
 
     const createPostRequest: CreatePostRequest = {
@@ -95,7 +98,6 @@ function NewPost() {
               <FormField
                 control={form.control}
                 name="title"
-                rules={{ required: "Title is required" }}
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Title</FormLabel>
@@ -110,7 +112,6 @@ function NewPost() {
               <FormField
                 control={form.control}
                 name="content"
-                rules={{ required: "Content is required" }}
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Content</FormLabel>
