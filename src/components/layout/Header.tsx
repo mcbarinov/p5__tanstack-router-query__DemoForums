@@ -1,4 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router"
+import { toast } from "sonner"
 
 import { useAuth } from "@/auth"
 import { Button } from "@/components/ui/button"
@@ -20,11 +21,13 @@ export function Header() {
 
   const handleLogout = async () => {
     await auth.logout()
+    toast.success("Logged out successfully")
     await navigate({ to: "/login", search: { redirect: undefined } })
   }
 
   const handleRefreshForums = () => {
     refreshForums()
+    toast.success("Forums refreshed")
   }
 
   const userInitials = auth.user

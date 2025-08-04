@@ -5,6 +5,6 @@ echo '@import "tailwindcss";' > src/index.css
 pnpm add @tanstack/react-query
 pnpm add -D @tanstack/eslint-plugin-query
 pnpm dlx shadcn@latest init
-pnpm dlx shadcn@latest add form dropdown-menu dialog card table textarea input skeleton badge avatar breadcrumb
-pnpm add ky msw uuid
+pnpm dlx shadcn@latest add form dropdown-menu dialog card table textarea input skeleton badge avatar breadcrumb sonner
+pnpm add ky msw
 pnpm dlx msw init public --save

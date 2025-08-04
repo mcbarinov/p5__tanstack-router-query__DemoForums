@@ -15,7 +15,7 @@ export const Route = createFileRoute("/_authenticated")({
         },
       })
     }
-    
+
     // Preload forums data for all authenticated routes
     return context.queryClient.ensureQueryData(forumsQueryOptions())
   },

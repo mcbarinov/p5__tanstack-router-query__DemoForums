@@ -2,7 +2,6 @@ import { createFileRoute, Link } from "@tanstack/react-router"
 import { useSuspenseQuery } from "@tanstack/react-query"
 
 import { forumsQueryOptions, forumPostsQueryOptions } from "@/lib/queries"
-import { PostsListSkeleton } from "@/components/loading/PostsListSkeleton"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -17,10 +16,7 @@ export const Route = createFileRoute("/_authenticated/forums_/$forumId")({
       return { forumId }
     },
   },
-  loader: ({ context: { queryClient }, params }) =>
-    queryClient.ensureQueryData(forumPostsQueryOptions(params.forumId)),
-  pendingComponent: PostsListSkeleton,
-  pendingMs: 100,
+  loader: ({ context: { queryClient }, params }) => queryClient.ensureQueryData(forumPostsQueryOptions(params.forumId)),
   component: ForumPosts,
 })
 

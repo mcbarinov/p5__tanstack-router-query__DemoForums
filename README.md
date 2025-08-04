@@ -9,6 +9,7 @@ A demonstration forum application built with modern React and TypeScript stack.
 - **TanStack Router** - File-based routing with loader support
 - **TanStack Query** - Powerful data synchronization for React
 - **Tailwind CSS v4** - Utility-first CSS framework
+- **Sonner** - Toast notifications for user feedback
 - **Vite** - Fast bundler and dev server
 - **ESLint + Prettier** - Code linting and formatting
 
@@ -28,8 +29,18 @@ src/
 │   ├── layout/           # Shared layout components
 │   │   ├── Header.tsx
 │   │   └── Footer.tsx
+│   ├── router/          # Router default components
+│   │   ├── ErrorComponent.tsx
+│   │   ├── NotFoundComponent.tsx
+│   │   └── PendingComponent.tsx
+│   ├── navigation/      # Navigation components
+│   │   └── PostBreadcrumb.tsx
 │   └── ui/              # Reusable UI components
-│       └── LoadingSpinner.tsx
+│       ├── LoadingSpinner.tsx
+│       ├── button.tsx
+│       ├── card.tsx
+│       ├── form.tsx
+│       └── ... (other shadcn/ui components)
 ├── routes/               # File-based routing (TanStack Router)
 │   ├── __root.tsx       # Root layout
 │   ├── _authenticated.tsx # Layout for protected routes
@@ -41,9 +52,11 @@ src/
 │           ├── $forumId.tsx      # Forum posts
 │           └── $forumId_/
 │               ├── $postId.tsx   # Post details
+│               ├── new.tsx       # Create new post
 │               └── -components/  # Route-local components
 │                   ├── PostInfo.tsx
-│                   └── CommentItem.tsx
+│                   ├── CommentItem.tsx
+│                   └── CommentForm.tsx
 ├── types.ts             # Shared TypeScript types
 ├── auth.tsx            # Authentication context
 ├── router.ts           # Router configuration
@@ -83,7 +96,7 @@ import * as z from "zod"
 
 ```typescript
 import { api } from "@/lib/api"
-import { PostDetailSkeleton } from "@/components/loading/PostDetailSkeleton"
+import { ErrorComponent } from "@/components/router/ErrorComponent"
 import { useAuth } from "@/auth"
 import type { User } from "@/types"
 ```
@@ -280,28 +293,55 @@ export const useCreatePostMutation = () => {
 - **Cache Management**: Automatic invalidation keeps data synchronized
 - **Parallel Loading**: Multiple queries load simultaneously in route loaders
 
-### Loading States
+### Router Default Components
 
-To improve user experience during data fetching, we implement loading indicators:
+The router is configured with default components for all routes:
 
 ```typescript
-export const Route = createFileRoute("/path")({
-  loader: async () => {
-    // Data fetching logic
-  },
-  pendingComponent: LoadingSpinner, // Component shown while loading
-  pendingMs: 100, // Show loader after 100ms (default: 1000ms)
-  component: MyComponent,
+export const router = createRouter({
+  routeTree,
+  // Default components for all routes
+  defaultPendingComponent: PendingComponent,
+  defaultErrorComponent: ErrorComponent,
+  defaultNotFoundComponent: NotFoundComponent,
+  defaultPendingMs: 100, // Show pending component after 100ms
+  defaultPendingMinMs: 500, // Show for at least 500ms to avoid flashing
 })
 ```
 
-Example: The forum detail page (`/forums/$forumId`) shows a loading spinner when navigating between forums. This provides immediate visual feedback to users, preventing the perception that links are broken during the 200-800ms API delay.
+These defaults provide:
+
+- **Consistent loading states** - All routes show the same loading spinner
+- **Unified error handling** - Errors are caught and displayed nicely
+- **404 pages** - Invalid routes show a helpful not found page
+- **No need for route-specific components** - Can still override on individual routes if needed
 
 ### Component Architecture
 
 - **Global components** - in `src/components/`
 - **Route-local components** - in `-components/` folder next to the route
 - **Layout components** - use `<Outlet />` for nested routes
+
+### User Feedback with Toast Notifications
+
+The app uses Sonner for toast notifications to provide immediate feedback for user actions:
+
+- **Success toasts** - Login, logout, post creation, comment creation
+- **Error toasts** - Failed operations, session expiration, validation errors
+- **Styled toasts** - Dark theme matching the app's design
+- **Position** - Top-right corner with 4-second duration
+
+Example usage:
+
+```typescript
+import { toast } from "sonner"
+
+// Success notification
+toast.success("Post created successfully!")
+
+// Error notification
+toast.error("Failed to create post")
+```
 
 ### Styling
 

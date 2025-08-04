@@ -2,7 +2,6 @@ import { createFileRoute } from "@tanstack/react-router"
 import { useSuspenseQuery } from "@tanstack/react-query"
 
 import { forumsQueryOptions, postQueryOptions, postCommentsQueryOptions } from "@/lib/queries"
-import { PostDetailSkeleton } from "@/components/loading/PostDetailSkeleton"
 import { PostBreadcrumb } from "@/components/navigation/PostBreadcrumb"
 
 import { PostInfo } from "./-components/PostInfo"
@@ -30,8 +29,6 @@ export const Route = createFileRoute("/_authenticated/forums_/$forumId_/$postId"
       queryClient.ensureQueryData(postQueryOptions(params.postId)),
       queryClient.ensureQueryData(postCommentsQueryOptions(params.postId)),
     ]),
-  pendingComponent: PostDetailSkeleton,
-  pendingMs: 100,
   component: PostDetail,
 })
 

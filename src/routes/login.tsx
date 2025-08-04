@@ -46,8 +46,9 @@ function LoginPage() {
       await auth.login(values.username, values.password)
       await navigate({ to: search.redirect ?? "/forums" })
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Invalid credentials"
       form.setError("root", {
-        message: error instanceof Error ? error.message : "Invalid credentials",
+        message: errorMessage,
       })
     }
   }

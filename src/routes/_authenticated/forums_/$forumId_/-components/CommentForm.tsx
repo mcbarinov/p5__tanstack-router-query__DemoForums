@@ -1,6 +1,7 @@
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
+import { toast } from "sonner"
 
 import { useCreateCommentMutation } from "@/lib/queries"
 import { Button } from "@/components/ui/button"
@@ -31,6 +32,10 @@ export function CommentForm({ postId }: CommentFormProps) {
       {
         onSuccess: () => {
           form.reset()
+          toast.success("Comment added successfully!")
+        },
+        onError: (error) => {
+          toast.error(error instanceof Error ? error.message : "Failed to add comment")
         },
       }
     )

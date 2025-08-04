@@ -3,6 +3,7 @@ import { useSuspenseQuery } from "@tanstack/react-query"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
+import { toast } from "sonner"
 
 import { forumsQueryOptions, useCreatePostMutation } from "@/lib/queries"
 import { useAuth } from "@/auth"
@@ -71,13 +72,14 @@ function NewPost() {
 
     createPostMutation.mutate(createPostRequest, {
       onSuccess: (newPost) => {
+        toast.success("Post created successfully!")
         void navigate({
           to: "/forums/$forumId/$postId",
           params: { forumId, postId: newPost.id },
         })
       },
       onError: (error) => {
-        console.error("Failed to create post:", error)
+        toast.error(error instanceof Error ? error.message : "Failed to create post")
       },
     })
   }
