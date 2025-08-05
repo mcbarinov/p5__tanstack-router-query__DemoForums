@@ -1,6 +1,14 @@
 # DemoForums
 
-A demonstration forum application built with modern React and TypeScript stack.
+A demonstration forum application built with modern React and TypeScript stack, featuring **secure-by-default** authentication architecture inspired by backend middleware patterns.
+
+## Key Architectural Features
+
+- 🔒 **Global Authentication Middleware** - All routes protected by default (except `/login`)
+- 🎯 **Type-Safe Authentication** - `useAuthUser()` guarantees non-null user in protected routes
+- 🏗️ **Smart Layout System** - Automatic Header/Footer for authenticated routes
+- 📁 **Clean Route Structure** - No `_authenticated` folder clutter
+- ⚡ **Fail-Safe Security** - Impossible to forget auth protection on new routes
 
 ## Tech Stack
 
@@ -28,7 +36,8 @@ src/
 ├── components/
 │   ├── layout/           # Shared layout components
 │   │   ├── Header.tsx
-│   │   └── Footer.tsx
+│   │   ├── Footer.tsx
+│   │   └── AuthenticatedLayout.tsx  # Smart layout wrapper
 │   ├── router/          # Router default components
 │   │   ├── ErrorComponent.tsx
 │   │   ├── NotFoundComponent.tsx
@@ -42,21 +51,19 @@ src/
 │       ├── form.tsx
 │       └── ... (other shadcn/ui components)
 ├── routes/               # File-based routing (TanStack Router)
-│   ├── __root.tsx       # Root layout
-│   ├── _authenticated.tsx # Layout for protected routes
-│   ├── index.tsx        # Home page
-│   ├── login.tsx        # Login page
-│   └── _authenticated/
-│       ├── forums.tsx   # Forums list
-│       └── forums_/
-│           ├── $forumId.tsx      # Forum posts
-│           └── $forumId_/
-│               ├── $postId.tsx   # Post details
-│               ├── new.tsx       # Create new post
-│               └── -components/  # Route-local components
-│                   ├── PostInfo.tsx
-│                   ├── CommentItem.tsx
-│                   └── CommentForm.tsx
+│   ├── __root.tsx       # Root layout with smart authentication middleware
+│   ├── index.tsx        # Home page (redirects to /forums)
+│   ├── login.tsx        # Login page (public route)
+│   ├── forums.tsx       # Forums list (protected)
+│   └── forums_/         # Non-nested forum routes (protected)
+│       ├── $forumId.tsx      # Forum posts
+│       └── $forumId_/
+│           ├── $postId.tsx   # Post details
+│           ├── new.tsx       # Create new post
+│           └── -components/  # Route-local components
+│               ├── PostInfo.tsx
+│               ├── CommentItem.tsx
+│               └── CommentForm.tsx
 ├── types.ts             # Shared TypeScript types
 ├── auth.tsx            # Authentication context
 ├── router.ts           # Router configuration
@@ -169,18 +176,57 @@ export const api = {
 - `lib/auth-storage.ts` - Storage utilities
 - `auth.tsx` - Authentication logic and state management
 
-### Protected Routes
+### Global Authentication Middleware
 
-Routes under `_authenticated/` require authentication. Unauthorized users are redirected to `/login`.
+The application uses a **secure-by-default** authentication pattern inspired by backend middleware:
+
+**Smart Root Layout (`__root.tsx`):**
+
+- **Global middleware**: All routes protected by default except `/login`
+- **Automatic layout**: Authenticated routes get Header/Footer automatically
+- **Type safety**: `useAuthUser()` hook guarantees non-null user in protected routes
+
+```typescript
+// Root component automatically determines layout
+function RootComponent() {
+  const location = useLocation()
+
+  // If login page, render without authenticated layout
+  if (location.pathname === "/login") {
+    return <Outlet />
+  }
+
+  // All other routes get authenticated layout automatically
+  return (
+    <AuthenticatedLayout>
+      <Outlet />
+    </AuthenticatedLayout>
+  )
+}
+```
+
+**Authentication Hooks:**
+
+- `useAuth()` - General hook (returns `user: User | null`)
+- `useAuthUser()` - Protected routes hook (returns `user: User` - never null)
+
+**Security Benefits:**
+
+- ✅ **Fail-safe**: Impossible to forget auth protection on new routes
+- ✅ **No optional chaining**: `auth.user.username` instead of `auth.user?.username`
+- ✅ **Clean code**: Routes focus on logic, not authentication boilerplate
+- ✅ **Backend pattern**: Works like server-side middleware
 
 ## Route Structure
 
 - `/` - Home page (redirects to `/forums`)
-- `/login` - Login page
-- `/forums` - All forums list
-- `/forums/:forumId` - Specific forum posts
-- `/forums/:forumId/new` - Create new post form
-- `/forums/:forumId/:postId` - Post details with comments
+- `/login` - Login page (**public** - no authentication required)
+- `/forums` - All forums list (**protected** - requires authentication)
+- `/forums/:forumId` - Specific forum posts (**protected**)
+- `/forums/:forumId/new` - Create new post form (**protected**)
+- `/forums/:forumId/:postId` - Post details with comments (**protected**)
+
+**Note**: All routes except `/login` are automatically protected by the global authentication middleware. New routes added will be secure by default.
 
 ## Development Commands
 
@@ -188,8 +234,11 @@ Routes under `_authenticated/` require authentication. Unauthorized users are re
 # Install dependencies
 pnpm install
 
-# Start dev server (port 3000)
+# Start dev server (port 3000) - for humans
 pnpm run dev
+
+# Start dev server (port 3001) - for AI agents
+pnpm run dev:agent
 
 # Build for production
 pnpm run build
@@ -242,7 +291,7 @@ export const forumQueryOptions = (id: number) =>
 Routes use `ensureQueryData` in loaders to prefetch data:
 
 ```typescript
-export const Route = createFileRoute("/_authenticated/forums")({
+export const Route = createFileRoute("/forums")({
   loader: ({ context: { queryClient } }) => queryClient.ensureQueryData(forumsQueryOptions()),
   component: ForumsList,
 })
@@ -318,9 +367,61 @@ These defaults provide:
 
 ### Component Architecture
 
+**Component Organization:**
+
 - **Global components** - in `src/components/`
 - **Route-local components** - in `-components/` folder next to the route
 - **Layout components** - use `<Outlet />` for nested routes
+
+**Smart Layout System:**
+
+- `AuthenticatedLayout.tsx` - Provides Header/Footer for authenticated routes
+- Automatically applied by root route based on path
+- No need to manually wrap route components
+
+**Component Examples:**
+
+```typescript
+// ✅ GOOD - Clean route component (no layout concerns)
+function ForumsList() {
+  const { data: forums } = useSuspenseQuery(forumsQueryOptions())
+
+  return (
+    <div>
+      <h2 className="text-2xl font-bold mb-4">Forums</h2>
+      {/* Route content only */}
+    </div>
+  )
+}
+
+// ❌ OLD - Manual layout wrapping (no longer needed)
+function ForumsList() {
+  return (
+    <AuthenticatedLayout>
+      <div>
+        <h2 className="text-2xl font-bold mb-4">Forums</h2>
+        {/* Content */}
+      </div>
+    </AuthenticatedLayout>
+  )
+}
+```
+
+**Authentication in Components:**
+
+```typescript
+// ✅ In protected routes - user guaranteed to exist
+function Header() {
+  const auth = useAuthUser() // Returns { user: User } - never null
+  return <span>{auth.user.username}</span> // No optional chaining needed
+}
+
+// ✅ In general components - user may be null
+function SomeGeneralComponent() {
+  const auth = useAuth() // Returns { user: User | null }
+  return <span>{auth.user?.username}</span> // Optional chaining required
+}
+```
 
 ### User Feedback with Toast Notifications
 

@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "@tanstack/react-router"
 import { toast } from "sonner"
 
-import { useAuth } from "@/auth"
+import { useAuthUser } from "@/auth"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import {
@@ -15,7 +15,7 @@ import {
 import { useRefreshForums } from "@/lib/queries"
 
 export function Header() {
-  const auth = useAuth()
+  const auth = useAuthUser()
   const navigate = useNavigate()
   const refreshForums = useRefreshForums()
 
@@ -30,14 +30,12 @@ export function Header() {
     toast.success("Forums refreshed")
   }
 
-  const userInitials = auth.user
-    ? auth.user.username
-        .split(" ")
-        .map((n) => n[0])
-        .join("")
-        .toUpperCase()
-        .slice(0, 2)
-    : ""
+  const userInitials = auth.user.username
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2)
 
   return (
     <header className="bg-gray-800 text-white p-4">
@@ -57,7 +55,7 @@ export function Header() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuLabel>{auth.user?.username}</DropdownMenuLabel>
+              <DropdownMenuLabel>{auth.user.username}</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleRefreshForums}>Refresh Forums</DropdownMenuItem>
               <DropdownMenuSeparator />

@@ -68,3 +68,12 @@ export function useAuth() {
   }
   return context
 }
+
+// eslint-disable-next-line react-refresh/only-export-components
+export function useAuthUser(): AuthContext & { user: User } {
+  const auth = useAuth()
+  if (!auth.user) {
+    throw new Error("useAuthUser must be used in authenticated routes")
+  }
+  return auth as AuthContext & { user: User }
+}

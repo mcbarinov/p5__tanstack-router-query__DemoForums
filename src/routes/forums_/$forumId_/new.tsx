@@ -6,7 +6,7 @@ import * as z from "zod"
 import { toast } from "sonner"
 
 import { forumsQueryOptions, useCreatePostMutation } from "@/lib/queries"
-import { useAuth } from "@/auth"
+import { useAuthUser } from "@/auth"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import type { CreatePostRequest } from "@/lib/api"
 
-export const Route = createFileRoute("/_authenticated/forums_/$forumId_/new")({
+export const Route = createFileRoute("/forums_/$forumId_/new")({
   params: {
     parse: (rawParams) => {
       const forumId = parseInt(rawParams.forumId)
@@ -36,7 +36,7 @@ const formSchema = z.object({
 function NewPost() {
   const { forumId } = Route.useParams()
   const { data: forums } = useSuspenseQuery(forumsQueryOptions())
-  const { user } = useAuth()
+  useAuthUser() // Ensure user is authenticated
   const navigate = useNavigate()
   const createPostMutation = useCreatePostMutation()
 
@@ -56,8 +56,6 @@ function NewPost() {
   })
 
   const onSubmit = (data: z.infer<typeof formSchema>) => {
-    if (!user) return
-
     const createPostRequest: CreatePostRequest = {
       forumId,
       title: data.title,

@@ -5,7 +5,7 @@ import { forumsQueryOptions } from "@/lib/queries"
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 
-export const Route = createFileRoute("/_authenticated/forums")({
+export const Route = createFileRoute("/forums")({
   loader: ({ context: { queryClient } }) => queryClient.ensureQueryData(forumsQueryOptions()),
   component: ForumsList,
 })

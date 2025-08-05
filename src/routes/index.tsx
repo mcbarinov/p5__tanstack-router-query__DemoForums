@@ -3,6 +3,6 @@ import { createFileRoute, redirect } from "@tanstack/react-router"
 
 export const Route = createFileRoute("/")({
   loader: () => {
-    return redirect({ to: "/login", search: { redirect: undefined } })
+    return redirect({ to: "/forums", search: { redirect: undefined } })
   },
 })

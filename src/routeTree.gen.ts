@@ -8,190 +8,140 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from './routes/__root'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as AuthenticatedForumsRouteImport } from './routes/_authenticated/forums'
-import { Route as AuthenticatedForumsForumIdRouteImport } from './routes/_authenticated/forums_/$forumId'
-import { Route as AuthenticatedForumsForumIdNewRouteImport } from './routes/_authenticated/forums_/$forumId_/new'
-import { Route as AuthenticatedForumsForumIdPostIdRouteImport } from './routes/_authenticated/forums_/$forumId_/$postId'
+import { Route as rootRouteImport } from "./routes/__root"
+import { Route as LoginRouteImport } from "./routes/login"
+import { Route as ForumsRouteImport } from "./routes/forums"
+import { Route as IndexRouteImport } from "./routes/index"
+import { Route as ForumsForumIdRouteImport } from "./routes/forums_/$forumId"
+import { Route as ForumsForumIdNewRouteImport } from "./routes/forums_/$forumId_/new"
+import { Route as ForumsForumIdPostIdRouteImport } from "./routes/forums_/$forumId_/$postId"
 
 const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
+  id: "/login",
+  path: "/login",
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedRoute = AuthenticatedRouteImport.update({
-  id: '/_authenticated',
+const ForumsRoute = ForumsRouteImport.update({
+  id: "/forums",
+  path: "/forums",
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+  id: "/",
+  path: "/",
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedForumsRoute = AuthenticatedForumsRouteImport.update({
-  id: '/forums',
-  path: '/forums',
-  getParentRoute: () => AuthenticatedRoute,
+const ForumsForumIdRoute = ForumsForumIdRouteImport.update({
+  id: "/forums_/$forumId",
+  path: "/forums/$forumId",
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedForumsForumIdRoute =
-  AuthenticatedForumsForumIdRouteImport.update({
-    id: '/forums_/$forumId',
-    path: '/forums/$forumId',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedForumsForumIdNewRoute =
-  AuthenticatedForumsForumIdNewRouteImport.update({
-    id: '/forums_/$forumId_/new',
-    path: '/forums/$forumId/new',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedForumsForumIdPostIdRoute =
-  AuthenticatedForumsForumIdPostIdRouteImport.update({
-    id: '/forums_/$forumId_/$postId',
-    path: '/forums/$forumId/$postId',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
+const ForumsForumIdNewRoute = ForumsForumIdNewRouteImport.update({
+  id: "/forums_/$forumId_/new",
+  path: "/forums/$forumId/new",
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForumsForumIdPostIdRoute = ForumsForumIdPostIdRouteImport.update({
+  id: "/forums_/$forumId_/$postId",
+  path: "/forums/$forumId/$postId",
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/login': typeof LoginRoute
-  '/forums': typeof AuthenticatedForumsRoute
-  '/forums/$forumId': typeof AuthenticatedForumsForumIdRoute
-  '/forums/$forumId/$postId': typeof AuthenticatedForumsForumIdPostIdRoute
-  '/forums/$forumId/new': typeof AuthenticatedForumsForumIdNewRoute
+  "/": typeof IndexRoute
+  "/forums": typeof ForumsRoute
+  "/login": typeof LoginRoute
+  "/forums/$forumId": typeof ForumsForumIdRoute
+  "/forums/$forumId/$postId": typeof ForumsForumIdPostIdRoute
+  "/forums/$forumId/new": typeof ForumsForumIdNewRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/login': typeof LoginRoute
-  '/forums': typeof AuthenticatedForumsRoute
-  '/forums/$forumId': typeof AuthenticatedForumsForumIdRoute
-  '/forums/$forumId/$postId': typeof AuthenticatedForumsForumIdPostIdRoute
-  '/forums/$forumId/new': typeof AuthenticatedForumsForumIdNewRoute
+  "/": typeof IndexRoute
+  "/forums": typeof ForumsRoute
+  "/login": typeof LoginRoute
+  "/forums/$forumId": typeof ForumsForumIdRoute
+  "/forums/$forumId/$postId": typeof ForumsForumIdPostIdRoute
+  "/forums/$forumId/new": typeof ForumsForumIdNewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/_authenticated': typeof AuthenticatedRouteWithChildren
-  '/login': typeof LoginRoute
-  '/_authenticated/forums': typeof AuthenticatedForumsRoute
-  '/_authenticated/forums_/$forumId': typeof AuthenticatedForumsForumIdRoute
-  '/_authenticated/forums_/$forumId_/$postId': typeof AuthenticatedForumsForumIdPostIdRoute
-  '/_authenticated/forums_/$forumId_/new': typeof AuthenticatedForumsForumIdNewRoute
+  "/": typeof IndexRoute
+  "/forums": typeof ForumsRoute
+  "/login": typeof LoginRoute
+  "/forums_/$forumId": typeof ForumsForumIdRoute
+  "/forums_/$forumId_/$postId": typeof ForumsForumIdPostIdRoute
+  "/forums_/$forumId_/new": typeof ForumsForumIdNewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/login'
-    | '/forums'
-    | '/forums/$forumId'
-    | '/forums/$forumId/$postId'
-    | '/forums/$forumId/new'
+  fullPaths: "/" | "/forums" | "/login" | "/forums/$forumId" | "/forums/$forumId/$postId" | "/forums/$forumId/new"
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/login'
-    | '/forums'
-    | '/forums/$forumId'
-    | '/forums/$forumId/$postId'
-    | '/forums/$forumId/new'
-  id:
-    | '__root__'
-    | '/'
-    | '/_authenticated'
-    | '/login'
-    | '/_authenticated/forums'
-    | '/_authenticated/forums_/$forumId'
-    | '/_authenticated/forums_/$forumId_/$postId'
-    | '/_authenticated/forums_/$forumId_/new'
+  to: "/" | "/forums" | "/login" | "/forums/$forumId" | "/forums/$forumId/$postId" | "/forums/$forumId/new"
+  id: "__root__" | "/" | "/forums" | "/login" | "/forums_/$forumId" | "/forums_/$forumId_/$postId" | "/forums_/$forumId_/new"
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  ForumsRoute: typeof ForumsRoute
   LoginRoute: typeof LoginRoute
+  ForumsForumIdRoute: typeof ForumsForumIdRoute
+  ForumsForumIdPostIdRoute: typeof ForumsForumIdPostIdRoute
+  ForumsForumIdNewRoute: typeof ForumsForumIdNewRoute
 }
 
-declare module '@tanstack/react-router' {
+declare module "@tanstack/react-router" {
   interface FileRoutesByPath {
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
+    "/login": {
+      id: "/login"
+      path: "/login"
+      fullPath: "/login"
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated': {
-      id: '/_authenticated'
-      path: ''
-      fullPath: ''
-      preLoaderRoute: typeof AuthenticatedRouteImport
+    "/forums": {
+      id: "/forums"
+      path: "/forums"
+      fullPath: "/forums"
+      preLoaderRoute: typeof ForumsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
+    "/": {
+      id: "/"
+      path: "/"
+      fullPath: "/"
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/forums': {
-      id: '/_authenticated/forums'
-      path: '/forums'
-      fullPath: '/forums'
-      preLoaderRoute: typeof AuthenticatedForumsRouteImport
-      parentRoute: typeof AuthenticatedRoute
+    "/forums_/$forumId": {
+      id: "/forums_/$forumId"
+      path: "/forums/$forumId"
+      fullPath: "/forums/$forumId"
+      preLoaderRoute: typeof ForumsForumIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/forums_/$forumId': {
-      id: '/_authenticated/forums_/$forumId'
-      path: '/forums/$forumId'
-      fullPath: '/forums/$forumId'
-      preLoaderRoute: typeof AuthenticatedForumsForumIdRouteImport
-      parentRoute: typeof AuthenticatedRoute
+    "/forums_/$forumId_/new": {
+      id: "/forums_/$forumId_/new"
+      path: "/forums/$forumId/new"
+      fullPath: "/forums/$forumId/new"
+      preLoaderRoute: typeof ForumsForumIdNewRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/forums_/$forumId_/new': {
-      id: '/_authenticated/forums_/$forumId_/new'
-      path: '/forums/$forumId/new'
-      fullPath: '/forums/$forumId/new'
-      preLoaderRoute: typeof AuthenticatedForumsForumIdNewRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/forums_/$forumId_/$postId': {
-      id: '/_authenticated/forums_/$forumId_/$postId'
-      path: '/forums/$forumId/$postId'
-      fullPath: '/forums/$forumId/$postId'
-      preLoaderRoute: typeof AuthenticatedForumsForumIdPostIdRouteImport
-      parentRoute: typeof AuthenticatedRoute
+    "/forums_/$forumId_/$postId": {
+      id: "/forums_/$forumId_/$postId"
+      path: "/forums/$forumId/$postId"
+      fullPath: "/forums/$forumId/$postId"
+      preLoaderRoute: typeof ForumsForumIdPostIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
   }
 }
 
-interface AuthenticatedRouteChildren {
-  AuthenticatedForumsRoute: typeof AuthenticatedForumsRoute
-  AuthenticatedForumsForumIdRoute: typeof AuthenticatedForumsForumIdRoute
-  AuthenticatedForumsForumIdPostIdRoute: typeof AuthenticatedForumsForumIdPostIdRoute
-  AuthenticatedForumsForumIdNewRoute: typeof AuthenticatedForumsForumIdNewRoute
-}
-
-const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
-  AuthenticatedForumsRoute: AuthenticatedForumsRoute,
-  AuthenticatedForumsForumIdRoute: AuthenticatedForumsForumIdRoute,
-  AuthenticatedForumsForumIdPostIdRoute: AuthenticatedForumsForumIdPostIdRoute,
-  AuthenticatedForumsForumIdNewRoute: AuthenticatedForumsForumIdNewRoute,
-}
-
-const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
-  AuthenticatedRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  ForumsRoute: ForumsRoute,
   LoginRoute: LoginRoute,
+  ForumsForumIdRoute: ForumsForumIdRoute,
+  ForumsForumIdPostIdRoute: ForumsForumIdPostIdRoute,
+  ForumsForumIdNewRoute: ForumsForumIdNewRoute,
 }
-export const routeTree = rootRouteImport
-  ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>()
+export const routeTree = rootRouteImport._addFileChildren(rootRouteChildren)._addFileTypes<FileRouteTypes>()

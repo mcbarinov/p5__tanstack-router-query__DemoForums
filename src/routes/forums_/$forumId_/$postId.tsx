@@ -8,7 +8,7 @@ import { PostInfo } from "./-components/PostInfo"
 import { CommentItem } from "./-components/CommentItem"
 import { CommentForm } from "./-components/CommentForm"
 
-export const Route = createFileRoute("/_authenticated/forums_/$forumId_/$postId")({
+export const Route = createFileRoute("/forums_/$forumId_/$postId")({
   params: {
     parse: (rawParams) => {
       const forumId = parseInt(rawParams.forumId)
